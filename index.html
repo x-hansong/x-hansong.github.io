@@ -77,83 +77,21 @@
     <div id="container">
       <div id="main">
 
-   
+  
+<section class="post" itemscope itemprop="blogitem">
+  
+    <a href="/2015/06/17/用hexo搭建github博客/" title="用hexo搭建github博客" itemprop="url">
+  
+    <h1 itemprop="name">用hexo搭建github博客</h1>
     
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
+     
+           <p itemprop="description" >背景搭建环境:Linux,nodejs,npm,git
+现在网上已经有很多关于搭建hexo github博客的文章,我自己也是参考别人的文章过来的,但是现在hexo已经到了3.0版本,很多教程都过时了,而且感觉他们教程的思路着重于怎么做,并没有说明背后的原因,所以我希望写一篇着重</p>
+        
     
-      <a href="/2015/06/17/用hexo搭建github博客/" title="用hexo搭建github博客" itemprop="url">用hexo搭建github博客</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Yonah-潇" target="_blank" itemprop="author">Yonah-潇</a>
-		
-  <p class="article-time">
-    <time datetime="2015-06-17T02:14:18.000Z" itemprop="datePublished"> 发表于 2015-06-17</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h1 id="背景">背景</h1><p><strong>搭建环境:Linux,nodejs,npm,git</strong></p>
-<p>现在网上已经有很多关于搭建hexo github博客的文章,我自己也是参考别人的文章过来的,但是现在hexo已经到了3.0版本,很多教程都过时了,而且感觉他们教程的思路着重于怎么做,并没有说明背后的原因,所以我希望写一篇着重于<strong>为什么</strong>,而不是怎么做的文章.我相信只有理解背后的原理才能更好更快的上手.</p>
-<p>其次,最好的教程就是官方文档,所以在这篇文章我引用的都是官方文档的内容,而且只是提供思路,不提供详细步骤.因为版本更新之后,操作是不一样的,官方文档会随时更新,但是这篇文章不一定会随时更新,然而思路是不变的,所以我极力推荐大家首先阅读官方文档.</p>
-<h2 id="什么是Github_Page">什么是Github Page</h2><p>首先,所谓的github博客是通过github page来实现的.</p>
-<p>简单的说，Github是一个具有版本管理功能的代码仓库，每个项目都有一个主页，列出项目的源文件。</p>
-<p>但是对于一个新手来说，看到一大堆源码，只会让人头晕脑涨，不知何处入手。<br>他希望看到的是，一个简明易懂的网页，说明每一步应该怎么做。</p>
-<p>因此，github就设计了Pages功能，允许用户自定义项目首页，用来替代默认的源码列表。</p>
-<p>所以，github Pages可以被认为是用户编写的、托管在github上的静态网页。</p>
-<h2 id="什么是Hexo">什么是Hexo</h2><blockquote>
-<p>Hexo 是一个快速、简洁且高效的博客框架。Hexo 使用 Markdown（或其他渲染引擎）解析文章，在几秒内，即可利用靓丽的主题生成静态网页。</p>
-</blockquote>
-<p>我们主要是用hexo在本地写博客,然后上传到github page,就像你commit项目代码到github一样.</p>
-<h1 id="操作">操作</h1><h2 id="建立一个Github_page">建立一个Github page</h2><p>首先注册个github账户,然后在本地配置ssh到github,这一步自行google.</p>
-<blockquote>
-<h2 id="Create_a_repository">Create a repository</h2><p>Head over to GitHub and create a new repository named username.github.io, where username is your username (or organization name) on GitHub.</p>
-<p>If the first part of the repository doesn’t exactly match your username, it won’t work, so make sure to get it right.</p>
-</blockquote>
-<p>官方教程主要强调命名项目的格式,即一定要命名为 username.github.io<br>同时,建完项目之后不要进行任何操作.我们可以直接用hexo初始化项目.</p>
-<h2 id="安装hexo">安装hexo</h2><p>这一步强烈推荐看<a href="http://hexo.io/zh-cn/docs/index.html" target="_blank" rel="external">Hexo 官方文档</a>,现在很多网上的安装过程是过时的,现在hexo是3.0了.<br>请耐心的看完官方文档以下内容<br><img src="/2015/06/17/用hexo搭建github博客/00.png" alt="00.png" title=""></p>
-<p>由于hexo3.0很多功能都插件化了,包括git上传,server功能.<br>所以我们要把博客上传到github就需要先装git插件<br>以下是常用插件</p>
-<pre><code>npm <span class="operator"><span class="keyword">install</span> hexo-generator-<span class="keyword">index</span> <span class="comment">--save</span>
-npm <span class="keyword">install</span> hexo-generator-archive <span class="comment">--save</span>
-npm <span class="keyword">install</span> hexo-generator-category <span class="comment">--save</span>
-npm <span class="keyword">install</span> hexo-generator-tag <span class="comment">--save</span>
-npm <span class="keyword">install</span> hexo-<span class="keyword">server</span> <span class="comment">--save</span>
-npm <span class="keyword">install</span> hexo-deployer-git <span class="comment">--save</span>
-npm <span class="keyword">install</span> hexo-renderer-marked@<span class="number">0.2</span> <span class="comment">--save</span>
-npm <span class="keyword">install</span> hexo-renderer-stylus@<span class="number">0.2</span> <span class="comment">--save</span>
-npm <span class="keyword">install</span> hexo-generator-feed@<span class="number">1</span> <span class="comment">--save</span>
-npm <span class="keyword">install</span> hexo-generator-sitemap@<span class="number">1</span> <span class="comment">--save</span></span>
-</code></pre><p>在命令行执行即可</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-	  	<span></span>
-		<a href="/2015/06/17/用hexo搭建github博客/#comments" class="ds-thread-count comments-count-link" data-thread-key="2015/06/17/用hexo搭建github博客/" data-count-type="comments">&nbsp;</a>
-	
-</div>
-
-</footer>
-
-
-    </article>
+    <time datetime="2015-06-17T02:14:18.000Z" itemprop="datePublished">2015-06-17</time>
+  </a>
+</section>
 
 
 
