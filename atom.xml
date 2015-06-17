@@ -4,9 +4,9 @@
   <title><![CDATA[ShareHub]]></title>
   <subtitle><![CDATA[悲观的意志,乐观的头脑]]></subtitle>
   <link href="/atom.xml" rel="self"/>
-  <link href="http://yoursite.com//"/>
-  <updated>2015-06-17T02:14:18.000Z</updated>
-  <id>http://yoursite.com//</id>
+  <link href="https://github.com/x-hansong//"/>
+  <updated>2015-06-17T04:59:10.000Z</updated>
+  <id>https://github.com/x-hansong//</id>
   
   <author>
     <name><![CDATA[Yonah-潇]]></name>
@@ -17,13 +17,32 @@
   
   <entry>
     <title><![CDATA[用hexo搭建github博客]]></title>
-    <link href="http://yoursite.com/2015/06/17/%E7%94%A8hexo%E6%90%AD%E5%BB%BAgithub%E5%8D%9A%E5%AE%A2/"/>
-    <id>http://yoursite.com/2015/06/17/用hexo搭建github博客/</id>
+    <link href="https://github.com/x-hansong/2015/06/17/%E7%94%A8hexo%E6%90%AD%E5%BB%BAgithub%E5%8D%9A%E5%AE%A2/"/>
+    <id>https://github.com/x-hansong/2015/06/17/用hexo搭建github博客/</id>
     <published>2015-06-17T02:14:18.000Z</published>
-    <updated>2015-06-17T02:14:18.000Z</updated>
-    <content type="html"></content>
+    <updated>2015-06-17T04:59:10.000Z</updated>
+    <content type="html"><![CDATA[<h1 id="背景">背景</h1><p>现在网上已经有很多关于搭建hexo github博客的文章,我自己也是参考别人的文章过来的,但是现在hexo已经到了3.0版本,很多教程都过时了,而且感觉他们教程的思路着重于怎么做,并没有说明背后的原因,所以我希望写一篇着重于<strong>为什么</strong>,而不是怎么做的文章.我相信只有理解背后的原理才能更好更快的上手.</p>
+<p>其次,最好的教程就是官方文档,所以在这篇文章我引用的都是官方文档的内容,而且只是提供思路,不提供详细步骤.因为版本更新之后,操作是不一样的,官方文档会随时更新,但是这篇文章不一定会随时更新,然而思路是不变的,所以我极力推荐大家首先阅读官方文档.</p>
+<h2 id="什么是Github_Page">什么是Github Page</h2><p>首先,所谓的github博客是通过github page来实现的.</p>
+<p>简单的说，Github是一个具有版本管理功能的代码仓库，每个项目都有一个主页，列出项目的源文件。</p>
+<p>但是对于一个新手来说，看到一大堆源码，只会让人头晕脑涨，不知何处入手。<br>他希望看到的是，一个简明易懂的网页，说明每一步应该怎么做。</p>
+<p>因此，github就设计了Pages功能，允许用户自定义项目首页，用来替代默认的源码列表。</p>
+<p>所以，github Pages可以被认为是用户编写的、托管在github上的静态网页。</p>
+<h2 id="什么是Hexo">什么是Hexo</h2><blockquote>
+<p>Hexo 是一个快速、简洁且高效的博客框架。Hexo 使用 Markdown（或其他渲染引擎）解析文章，在几秒内，即可利用靓丽的主题生成静态网页。</p>
+</blockquote>
+<p>我们主要是用hexo在本地写博客,然后上传到github page,就像你commit项目代码到github一样.</p>
+<h1 id="操作">操作</h1><h2 id="建立一个Github_page">建立一个Github page</h2><p>首先注册个github账户,然后在本地配置ssh到github,这一步自行google.</p>
+<blockquote>
+<h2 id="Create_a_repository">Create a repository</h2><p>Head over to GitHub and create a new repository named username.github.io, where username is your username (or organization name) on GitHub.</p>
+<p>If the first part of the repository doesn’t exactly match your username, it won’t work, so make sure to get it right.</p>
+</blockquote>
+<p>官方教程主要强调命名项目的格式,即一定要命名为 username.github.io<br>同时,建完项目之后不要进行任何操作.我们可以直接用hexo初始化项目.</p>
+<h2 id="安装hexo">安装hexo</h2><p>这一步强烈推荐看<a href="http://hexo.io/zh-cn/docs/index.html" target="_blank" rel="external">Hexo 官方文档</a>,现在很多网上的安装过程是过时的,现在hexo是3.0了.<br>请耐心的看完官方文档以下内容<br></p>
+<p>由于hexo3.0很多功能都插件化了,包括git上传,server功能.<br>所以我们要把博客上传到github就需要先装git插件</p>
+]]></content>
     <summary type="html">
-    
+    <![CDATA[<h1 id="背景">背景</h1><p>现在网上已经有很多关于搭建hexo github博客的文章,我自己也是参考别人的文章过来的,但是现在hexo已经到了3.0版本,很多教程都过时了,而且感觉他们教程的思路着重于怎么做,并没有说明背后的原因,所以我希望写一篇着重于<stro]]>
     </summary>
     
   </entry>
