@@ -34,7 +34,15 @@
 
 3. 利用该问题分解出的子">
 <meta property="og:image" content="https://github.com/x-hansong/2015/06/18/算法学习之分治法-divide-and-conquer/00.png">
-<meta property="og:updated_time" content="2015-06-18T11:47:06.000Z">
+<meta property="og:image" content="https://github.com/x-hansong/2015/06/18/算法学习之分治法-divide-and-conquer/01.png">
+<meta property="og:image" content="https://github.com/x-hansong/2015/06/18/算法学习之分治法-divide-and-conquer/02.png">
+<meta property="og:image" content="https://github.com/x-hansong/2015/06/18/算法学习之分治法-divide-and-conquer/03.png">
+<meta property="og:image" content="https://github.com/x-hansong/2015/06/18/算法学习之分治法-divide-and-conquer/04.png">
+<meta property="og:image" content="https://github.com/x-hansong/2015/06/18/算法学习之分治法-divide-and-conquer/05.jpg">
+<meta property="og:image" content="https://github.com/x-hansong/2015/06/18/算法学习之分治法-divide-and-conquer/06.jpg">
+<meta property="og:image" content="https://github.com/x-hansong/2015/06/18/算法学习之分治法-divide-and-conquer/07.png">
+<meta property="og:image" content="https://github.com/x-hansong/2015/06/18/算法学习之分治法-divide-and-conquer/08.png">
+<meta property="og:updated_time" content="2015-06-18T12:15:43.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="算法学习之分治法(divide and conquer)">
 <meta name="twitter:description" content="什么是分治法字面上的解释是“分而治之”，就是把一个复杂的问题分成两个或更多的相同或相似的子问题，直到最后子问题可以简单的直接求解，原问题的解即子问题的解的合并。
@@ -141,20 +149,20 @@
 <p>第三条特征是关键，能否利用分治法完全取决于问题是否具有第三条特征，如果具备了第一条和第二条特征，而不具备第三条特征，则可以考虑用贪心法或动态规划法。</p>
 <p>第四条特征涉及到分治法的效率，如果各子问题是不独立的则分治法要做许多不必要的工作，重复地解公共的子问题，此时虽然可用分治法，但一般用动态规划法较好。</p>
 <h2 id="应用问题">应用问题</h2><h3 id="归并排序">归并排序</h3><p>可以看到排序问题正好满足以上提到的四个特征。<br>归并排序通过将待排序数组分为两个部分，递归地处理它们，最终将两个排序好的部分合并起来。<br>值得一提的是归并排序通过数组的下标分割子问题，即每次都把数组分为两半。</p>
-<p><strong>伪代码如下</strong><br>_</p>
-<p>_</p>
-<p><strong>例子</strong><br>_</p>
+<p><strong>伪代码如下</strong><br><img src="/2015/06/18/算法学习之分治法-divide-and-conquer/01.png" alt="[merge_sort]" title="[merge_sort]">_</p>
+<p><img src="/2015/06/18/算法学习之分治法-divide-and-conquer/02.png" alt="[merge]" title="[merge]">_</p>
+<p><strong>例子</strong><br><img src="/2015/06/18/算法学习之分治法-divide-and-conquer/03.png" alt="[例子]" title="[例子]">_</p>
 <h3 id="快速排序">快速排序</h3><p>跟归并排序的思想是类似的，但是快速排序是根据值来分割子问题，即把数组根据一个值分为大于和小于它两个部分。</p>
 <p><strong>伪代码如下</strong></p>
-<p>_</p>
-<p>_</p>
+<p><img src="/2015/06/18/算法学习之分治法-divide-and-conquer/04.png" alt="[quick_sort]" title="[quick_sort]">_</p>
+<p><img src="/2015/06/18/算法学习之分治法-divide-and-conquer/05.jpg" alt="[partition]" title="[partition]">_</p>
 <p><strong>例子</strong></p>
-<p>_</p>
+<p><img src="/2015/06/18/算法学习之分治法-divide-and-conquer/06.jpg" alt="[例子]" title="[例子]">_</p>
 <h3 id="二分搜索">二分搜索</h3><p>对一个有序的数组进行二分搜索，每次比较中间的值，key大于它说明在右边，小于说明左边。</p>
 <p><strong>伪代码如下</strong></p>
-<p>_</p>
+<p><img src="/2015/06/18/算法学习之分治法-divide-and-conquer/07.png" alt="[binary_search]" title="[binary_search]">_</p>
 <p><strong>例子</strong></p>
-<p>_</p>
+<p><img src="/2015/06/18/算法学习之分治法-divide-and-conquer/08.png" alt="[例子]" title="[例子]">_</p>
   
 	</div>
 		<footer class="article-footer clearfix">
