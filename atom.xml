@@ -5,7 +5,7 @@
   <subtitle><![CDATA[悲观的意志,乐观的头脑]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="https://github.com/x-hansong//"/>
-  <updated>2015-06-18T13:18:21.000Z</updated>
+  <updated>2015-06-18T13:33:55.000Z</updated>
   <id>https://github.com/x-hansong//</id>
   
   <author>
@@ -20,8 +20,8 @@
     <link href="https://github.com/x-hansong/2015/06/18/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E4%B9%8B%E5%88%86%E6%B2%BB%E6%B3%95-divide-and-conquer/"/>
     <id>https://github.com/x-hansong/2015/06/18/算法学习之分治法-divide-and-conquer/</id>
     <published>2015-06-18T10:50:50.000Z</published>
-    <updated>2015-06-18T13:18:21.000Z</updated>
-    <content type="html"><![CDATA[<h1 id="什么是分治法">什么是分治法</h1><p>字面上的解释是“分而治之”，就是把一个复杂的问题分成两个或更多的相同或相似的子问题，直到最后子问题可以简单的直接求解，原问题的解即子问题的解的合并。</p>
+    <updated>2015-06-18T13:33:55.000Z</updated>
+    <content type="html"><![CDATA[<h2 id="什么是分治法">什么是分治法</h2><p>字面上的解释是“分而治之”，就是把一个复杂的问题分成两个或更多的相同或相似的子问题，直到最后子问题可以简单的直接求解，原问题的解即子问题的解的合并。</p>
 <h2 id="解决问题的流程">解决问题的流程</h2><p><img src="/2015/06/18/算法学习之分治法-divide-and-conquer/00.png" alt="[divide and conquer]" title="[divide and conquer]">_</p>
 <h2 id="分治法适用情况">分治法适用情况</h2><pre><code>分治法所能解决的问题一般具有以下几个特征：
 
@@ -31,7 +31,7 @@
 
 <span class="bullet">3. </span>利用该问题分解出的子问题的解可以合并为该问题的解；
 
-<span class="bullet">4. </span>该问题所分解出的各个子问题是相互独立的，即子问题之间不包含公共的子子问题。
+<span class="bullet">4. </span>该问题所分解出的各个子问题是相互独立的，即子问题之间不包含公共的子问题。
 </code></pre><p>第一条特征是绝大多数问题都可以满足的，因为问题的计算复杂性一般是随着问题规模的增加而增加；</p>
 <p>第二条特征是应用分治法的前提它也是大多数问题可以满足的，此特征反映了递归思想的应用；、</p>
 <p>第三条特征是关键，能否利用分治法完全取决于问题是否具有第三条特征，如果具备了第一条和第二条特征，而不具备第三条特征，则可以考虑用贪心法或动态规划法。</p>
@@ -51,13 +51,12 @@
 <p><img src="/2015/06/18/算法学习之分治法-divide-and-conquer/07.png" alt="[binary_search]" title="[binary_search]">_</p>
 <p><strong>例子</strong></p>
 <p><img src="/2015/06/18/算法学习之分治法-divide-and-conquer/08.png" alt="[例子]" title="[例子]">_</p>
-<h3 id="大整数乘法">大整数乘法</h3><p>对于任意位数的2个数相乘<code>a \* b</code>，写成：</p>
-<p><code>a  =  a1 \* 10^(n1/2)   +  a0</code>　　　　　　——-n1为a的位数</p>
-<p><code>b  =  b1 \* 10^(n2/2)  +  b0</code>　　　　　——-n2为b的位数</p>
-<p>分治策略就是基于以上变换，将a，b写成前一半数字和后一半数字相加的形式，例如若a = 5423678，那么a1 = 542，a0 = 3678（注意若不是偶数截取较小一半）</p>
-<p>这样a和b相乘就可以写为：<code>a \* b = {  a1 \* 10^(n1/2)   +  a0   }  \*  {  b1 \* 10^(n2/2)  +  b0  }</code></p>
-<p>展开后整理得： <code>a  \*  b  =  a1\*b1 \* 10^\[ (n1+n2)/2  ]   +  a1\*b0 \* 10^(n1/2)   +   a0\*b1 \* 10^(n2/2)  + a0\*b0</code>　　四项</p>
-<p>这样就很容易递归的来求<code>a \* b</code>，如果你嫌分解后的数还太大，就可以继续分解。（你可以自己规定在何时结束递归）</p>
+<h3 id="大整数乘法">大整数乘法</h3><p>对于任意位数的2个数相乘<code>a * b</code>，写成：</p>
+<p><code>a = a1 * 10^(n1/2) + a0</code>　　　　　　——-n1为a的位数</p>
+<p><code>b = b1 * 10^(n2/2) + b0</code>　　　　　——-n2为b的位数分治策略就是基于以上变换，将a，b写成前一半数字和后一半数字相加的形式，例如若a = 5423678，那么a1 = 542，a0 = 3678（注意若不是偶数截取较小一半）</p>
+<p>这样a和b相乘就可以写为：<code>a * b = { a1 * 10^(n1/2) + a0 } * { b1 * 10^(n2/2) + b0 }</code></p>
+<p>展开后整理得： <code>a * b = a1*b1 * 10^[ (n1+n2)/2 ] + a1*b0 * 10^(n1/2) + a0*b1 * 10^(n2/2) + a0*b0</code>　　四项</p>
+<p>这样就很容易递归的来求<code>a * b</code>，如果你嫌分解后的数还太大，就可以继续分解。（你可以自己规定在何时结束递归）</p>
 <h2 id="总结">总结</h2><p>分治法实际上就是类似于数学归纳法，找到解决本问题的求解方程公式，然后根据方程公式设计递归程序。</p>
 <ol>
 <li>一定是先找到最小问题规模时的求解方法</li>
@@ -67,7 +66,7 @@
 <p>参考资料：<br><a href="http://www.cnblogs.com/steven_oyj/archive/2010/05/22/1741370.html" target="_blank" rel="external">五大常用算法之一：分治算法</a><br><a href="http://www.cnblogs.com/kkgreen/archive/2011/06/12/2078668.html" target="_blank" rel="external">大整数乘法和Strassen矩阵乘法</a></p>
 ]]></content>
     <summary type="html">
-    <![CDATA[<h1 id="什么是分治法">什么是分治法</h1><p>字面上的解释是“分而治之”，就是把一个复杂的问题分成两个或更多的相同或相似的子问题，直到最后子问题可以简单的直接求解，原问题的解即子问题的解的合并。</p>
+    <![CDATA[<h2 id="什么是分治法">什么是分治法</h2><p>字面上的解释是“分而治之”，就是把一个复杂的问题分成两个或更多的相同或相似的子问题，直到最后子问题可以简单的直接求解，原问题的解即子问题的解的合并。</p>
 <h2 id="解决问题的流程">解决问题的流程</h2><p]]>
     </summary>
     
@@ -192,7 +191,7 @@
     <link href="https://github.com/x-hansong/2015/06/17/%E7%94%A8hexo%E6%90%AD%E5%BB%BAgithub%E5%8D%9A%E5%AE%A2/"/>
     <id>https://github.com/x-hansong/2015/06/17/用hexo搭建github博客/</id>
     <published>2015-06-17T02:14:18.000Z</published>
-    <updated>2015-06-17T08:32:38.000Z</updated>
+    <updated>2015-06-18T13:32:10.000Z</updated>
     <content type="html"><![CDATA[<h1 id="背景">背景</h1><p><strong>搭建环境:Linux,nodejs,npm,git</strong></p>
 <p>现在网上已经有很多关于搭建hexo github博客的文章,我自己也是参考别人的文章过来的,但是现在hexo已经到了3.0版本,很多教程都过时了,而且感觉他们教程的思路着重于怎么做,并没有说明背后的原因,所以我希望写一篇着重于<strong>为什么</strong>,而不是怎么做的文章.我相信只有理解背后的原理才能更好更快的上手.</p>
 <p>其次,最好的教程就是官方文档,所以在这篇文章我引用的都是官方文档的内容,而且只是提供思路,不提供详细步骤.因为版本更新之后,操作是不一样的,官方文档会随时更新,但是这篇文章不一定会随时更新,然而思路是不变的,所以我极力推荐大家首先阅读官方文档.</p>
@@ -264,7 +263,7 @@ npm <span class="keyword">install</span> hexo-generator-sitemap@<span class="num
 <p>总的来说,刚开始配置就是一直在折腾,需要有足够的耐心,可能大家都喜欢看别人一步步的详细的步骤,自己只要复制粘贴就行了.但是有时候即使你完全照着做也会出问题的,因为版本和环境不一样.</p>
 <p>一开始我也是这样,后来才发现,最好的方法是查看别人做的思路,然后去找官方的文档.这样遇到的问题会大大减少,有时候你纠结半天的问题可能只是版本不一样.就像前面deploy部署,所有文章都是没有提到要先装</p>
 <pre><code>npm <span class="operator"><span class="keyword">install</span> hexo-deployer-git <span class="comment">--save</span></span>
-</code></pre><p>因为hexo3.0把它插件化了,然后我在官方文档找到了答案.</p>
+</code></pre><p>因为hexo3.0把它插件化了,然后我在官方文档找到了答案.<br><strong>最后提示一下：如果运行命令出现什么问题，加上sudo试试看看，里面有些需要root权限</strong></p>
 <p>仅以此文记录折腾hexo的过程,并且希望给后来者有参考价值.</p>
 ]]></content>
     <summary type="html">
