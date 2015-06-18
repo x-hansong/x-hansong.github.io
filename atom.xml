@@ -5,7 +5,7 @@
   <subtitle><![CDATA[悲观的意志,乐观的头脑]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="https://github.com/x-hansong//"/>
-  <updated>2015-06-17T07:43:35.000Z</updated>
+  <updated>2015-06-18T08:36:22.000Z</updated>
   <id>https://github.com/x-hansong//</id>
   
   <author>
@@ -16,11 +16,71 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title><![CDATA[算法基本概念]]></title>
+    <link href="https://github.com/x-hansong/2015/06/18/%E7%AE%97%E6%B3%95%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/"/>
+    <id>https://github.com/x-hansong/2015/06/18/算法基本概念/</id>
+    <published>2015-06-18T08:18:24.000Z</published>
+    <updated>2015-06-18T08:36:22.000Z</updated>
+    <content type="html"><![CDATA[<h2 id="算法的定义">算法的定义</h2><blockquote>
+<p>An algorithm is a sequence of unambiguous instructions for solving a problem</p>
+</blockquote>
+<p>即算法是解决问题的无二义性的指令序列.简单说就是用来解决问题步骤.</p>
+<h2 id="算法设计及实现流程">算法设计及实现流程</h2><p><img src="http://img.blog.csdn.net/20150615181318512" alt="算法设计及实现流程"></p>
+<h2 id="重要的问题类型">重要的问题类型</h2><ul>
+<li>Sorting</li>
+<li>Searching</li>
+<li>String processing</li>
+<li>Graph problems</li>
+<li>Combinatorial problems</li>
+<li>Geometric problems</li>
+<li>Numerical Problems</li>
+</ul>
+<h2 id="基础数据结构">基础数据结构</h2><ul>
+<li>linear data structure<ul>
+<li>array</li>
+<li>list</li>
+<li>stack</li>
+<li>queue</li>
+</ul>
+</li>
+<li>graphs</li>
+<li>tree</li>
+<li>set and dictionaries</li>
+</ul>
+<h2 id="常用的算法思想">常用的算法思想</h2><ul>
+<li>Brute force (暴力求解)</li>
+<li>Divide and conquer (分治法)</li>
+<li>Decrease and conquer (减治法)</li>
+<li>Transform and conquer (转治法)</li>
+<li>Space and time tradeoffs (时空权衡)</li>
+<li>Greedy approach (贪婪算法)</li>
+<li>Dynamic programming (动态规划)</li>
+<li>Iterative improvement (迭代改进)</li>
+<li>Backtracking (回溯法)</li>
+<li><p>Branch and bound (分支界限法)</p>
+<p>  基本上,算法就是围绕上面提到的问题和数据结构进行研究,遇到某个问题时,先分析问题,确定问题类型和使用的数据结构,有利于快速找到头绪.</p>
+</li>
+</ul>
+]]></content>
+    <summary type="html">
+    <![CDATA[<h2 id="算法的定义">算法的定义</h2><blockquote>
+<p>An algorithm is a sequence of unambiguous instructions for solving a problem</p>
+</blockquote>
+<p>即]]>
+    </summary>
+    
+      <category term="算法" scheme="https://github.com/x-hansong/tags/%E7%AE%97%E6%B3%95/"/>
+    
+      <category term="算法学习" scheme="https://github.com/x-hansong/categories/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0/"/>
+    
+  </entry>
+  
+  <entry>
     <title><![CDATA[用hexo搭建github博客]]></title>
     <link href="https://github.com/x-hansong/2015/06/17/%E7%94%A8hexo%E6%90%AD%E5%BB%BAgithub%E5%8D%9A%E5%AE%A2/"/>
     <id>https://github.com/x-hansong/2015/06/17/用hexo搭建github博客/</id>
     <published>2015-06-17T02:14:18.000Z</published>
-    <updated>2015-06-17T07:43:35.000Z</updated>
+    <updated>2015-06-17T08:32:38.000Z</updated>
     <content type="html"><![CDATA[<h1 id="背景">背景</h1><p><strong>搭建环境:Linux,nodejs,npm,git</strong></p>
 <p>现在网上已经有很多关于搭建hexo github博客的文章,我自己也是参考别人的文章过来的,但是现在hexo已经到了3.0版本,很多教程都过时了,而且感觉他们教程的思路着重于怎么做,并没有说明背后的原因,所以我希望写一篇着重于<strong>为什么</strong>,而不是怎么做的文章.我相信只有理解背后的原理才能更好更快的上手.</p>
 <p>其次,最好的教程就是官方文档,所以在这篇文章我引用的都是官方文档的内容,而且只是提供思路,不提供详细步骤.因为版本更新之后,操作是不一样的,官方文档会随时更新,但是这篇文章不一定会随时更新,然而思路是不变的,所以我极力推荐大家首先阅读官方文档.</p>
@@ -99,6 +159,8 @@ npm <span class="keyword">install</span> hexo-generator-sitemap@<span class="num
     <![CDATA[<h1 id="背景">背景</h1><p><strong>搭建环境:Linux,nodejs,npm,git</strong></p>
 <p>现在网上已经有很多关于搭建hexo github博客的文章,我自己也是参考别人的文章过来的,但是现在hexo已经到了3.0版本,很多教程]]>
     </summary>
+    
+      <category term="hexo github" scheme="https://github.com/x-hansong/tags/hexo-github/"/>
     
       <category term="Hexo" scheme="https://github.com/x-hansong/categories/Hexo/"/>
     
