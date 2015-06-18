@@ -5,7 +5,7 @@
   <subtitle><![CDATA[悲观的意志,乐观的头脑]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="https://github.com/x-hansong//"/>
-  <updated>2015-06-18T12:15:43.000Z</updated>
+  <updated>2015-06-18T13:18:21.000Z</updated>
   <id>https://github.com/x-hansong//</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://github.com/x-hansong/2015/06/18/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E4%B9%8B%E5%88%86%E6%B2%BB%E6%B3%95-divide-and-conquer/"/>
     <id>https://github.com/x-hansong/2015/06/18/算法学习之分治法-divide-and-conquer/</id>
     <published>2015-06-18T10:50:50.000Z</published>
-    <updated>2015-06-18T12:15:43.000Z</updated>
+    <updated>2015-06-18T13:18:21.000Z</updated>
     <content type="html"><![CDATA[<h1 id="什么是分治法">什么是分治法</h1><p>字面上的解释是“分而治之”，就是把一个复杂的问题分成两个或更多的相同或相似的子问题，直到最后子问题可以简单的直接求解，原问题的解即子问题的解的合并。</p>
 <h2 id="解决问题的流程">解决问题的流程</h2><p><img src="/2015/06/18/算法学习之分治法-divide-and-conquer/00.png" alt="[divide and conquer]" title="[divide and conquer]">_</p>
 <h2 id="分治法适用情况">分治法适用情况</h2><pre><code>分治法所能解决的问题一般具有以下几个特征：
@@ -51,6 +51,20 @@
 <p><img src="/2015/06/18/算法学习之分治法-divide-and-conquer/07.png" alt="[binary_search]" title="[binary_search]">_</p>
 <p><strong>例子</strong></p>
 <p><img src="/2015/06/18/算法学习之分治法-divide-and-conquer/08.png" alt="[例子]" title="[例子]">_</p>
+<h3 id="大整数乘法">大整数乘法</h3><p>对于任意位数的2个数相乘<code>a \* b</code>，写成：</p>
+<p><code>a  =  a1 \* 10^(n1/2)   +  a0</code>　　　　　　——-n1为a的位数</p>
+<p><code>b  =  b1 \* 10^(n2/2)  +  b0</code>　　　　　——-n2为b的位数</p>
+<p>分治策略就是基于以上变换，将a，b写成前一半数字和后一半数字相加的形式，例如若a = 5423678，那么a1 = 542，a0 = 3678（注意若不是偶数截取较小一半）</p>
+<p>这样a和b相乘就可以写为：<code>a \* b = {  a1 \* 10^(n1/2)   +  a0   }  \*  {  b1 \* 10^(n2/2)  +  b0  }</code></p>
+<p>展开后整理得： <code>a  \*  b  =  a1\*b1 \* 10^\[ (n1+n2)/2  ]   +  a1\*b0 \* 10^(n1/2)   +   a0\*b1 \* 10^(n2/2)  + a0\*b0</code>　　四项</p>
+<p>这样就很容易递归的来求<code>a \* b</code>，如果你嫌分解后的数还太大，就可以继续分解。（你可以自己规定在何时结束递归）</p>
+<h2 id="总结">总结</h2><p>分治法实际上就是类似于数学归纳法，找到解决本问题的求解方程公式，然后根据方程公式设计递归程序。</p>
+<ol>
+<li>一定是先找到最小问题规模时的求解方法</li>
+<li>然后考虑随着问题规模增大时的求解方法</li>
+<li>找到求解的递归函数式后（各种规模或因子），设计递归程序即可。</li>
+</ol>
+<p>参考资料：<br><a href="http://www.cnblogs.com/steven_oyj/archive/2010/05/22/1741370.html" target="_blank" rel="external">五大常用算法之一：分治算法</a><br><a href="http://www.cnblogs.com/kkgreen/archive/2011/06/12/2078668.html" target="_blank" rel="external">大整数乘法和Strassen矩阵乘法</a></p>
 ]]></content>
     <summary type="html">
     <![CDATA[<h1 id="什么是分治法">什么是分治法</h1><p>字面上的解释是“分而治之”，就是把一个复杂的问题分成两个或更多的相同或相似的子问题，直到最后子问题可以简单的直接求解，原问题的解即子问题的解的合并。</p>
