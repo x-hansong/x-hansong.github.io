@@ -4,32 +4,48 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>算法学习之暴力求解(brute force) | ShareHub</title>
+    <title>算法学习之分治法(divide and conquer) | ShareHub</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="Yonah-潇">
     
 
     
-    <meta name="description" content="暴力求解(brute force)
-Brute force is a straightforward approach to solving a problem, usually directly based on the problem statement and definitions of the concepts involved.
+    <meta name="description" content="什么是分治法字面上的解释是“分而治之”，就是把一个复杂的问题分成两个或更多的相同或相似的子问题，直到最后子问题可以简单的直接求解，原问题的解即子问题的解的合并。
+解决问题的流程_
+分治法适用情况分治法所能解决的问题一般具有以下几个特征：
 
-暴力求解即根据问题的描述和定义直接求解,不使用一些特殊">
+1. 该问题的规模缩小到一定的程度就可以容易地解决
+
+2. 该问题可以分解为若干个规模较小的相同问题，即该问题具有最优子结构性质。
+
+3. 利用该问题分解出的子">
 <meta property="og:type" content="article">
-<meta property="og:title" content="算法学习之暴力求解(brute force)">
-<meta property="og:url" content="https://github.com/x-hansong/2015/06/18/算法学习之暴力求解-brute-force/index.html">
+<meta property="og:title" content="算法学习之分治法(divide and conquer)">
+<meta property="og:url" content="https://github.com/x-hansong/2015/06/18/算法学习之分治法-divide-and-conquer/index.html">
 <meta property="og:site_name" content="ShareHub">
-<meta property="og:description" content="暴力求解(brute force)
-Brute force is a straightforward approach to solving a problem, usually directly based on the problem statement and definitions of the concepts involved.
+<meta property="og:description" content="什么是分治法字面上的解释是“分而治之”，就是把一个复杂的问题分成两个或更多的相同或相似的子问题，直到最后子问题可以简单的直接求解，原问题的解即子问题的解的合并。
+解决问题的流程_
+分治法适用情况分治法所能解决的问题一般具有以下几个特征：
 
-暴力求解即根据问题的描述和定义直接求解,不使用一些特殊">
-<meta property="og:updated_time" content="2015-06-18T09:02:23.000Z">
+1. 该问题的规模缩小到一定的程度就可以容易地解决
+
+2. 该问题可以分解为若干个规模较小的相同问题，即该问题具有最优子结构性质。
+
+3. 利用该问题分解出的子">
+<meta property="og:image" content="https://github.com/x-hansong/2015/06/18/算法学习之分治法-divide-and-conquer/00.png">
+<meta property="og:updated_time" content="2015-06-18T11:47:06.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="算法学习之暴力求解(brute force)">
-<meta name="twitter:description" content="暴力求解(brute force)
-Brute force is a straightforward approach to solving a problem, usually directly based on the problem statement and definitions of the concepts involved.
+<meta name="twitter:title" content="算法学习之分治法(divide and conquer)">
+<meta name="twitter:description" content="什么是分治法字面上的解释是“分而治之”，就是把一个复杂的问题分成两个或更多的相同或相似的子问题，直到最后子问题可以简单的直接求解，原问题的解即子问题的解的合并。
+解决问题的流程_
+分治法适用情况分治法所能解决的问题一般具有以下几个特征：
 
-暴力求解即根据问题的描述和定义直接求解,不使用一些特殊">
+1. 该问题的规模缩小到一定的程度就可以容易地解决
+
+2. 该问题可以分解为若干个规模较小的相同问题，即该问题具有最优子结构性质。
+
+3. 利用该问题分解出的子">
 
     
     <link rel="alternative" href="/atom.xml" title="ShareHub" type="application/atom+xml">
@@ -89,14 +105,14 @@ Brute force is a straightforward approach to solving a problem, usually directly
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/06/18/算法学习之暴力求解-brute-force/" title="算法学习之暴力求解(brute force)" itemprop="url">算法学习之暴力求解(brute force)</a>
+      <a href="/2015/06/18/算法学习之分治法-divide-and-conquer/" title="算法学习之分治法(divide and conquer)" itemprop="url">算法学习之分治法(divide and conquer)</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Yonah-潇" target="_blank" itemprop="author">Yonah-潇</a>
 		
   <p class="article-time">
-    <time datetime="2015-06-18T08:53:51.000Z" itemprop="datePublished"> 发表于 2015-06-18</time>
+    <time datetime="2015-06-18T10:50:50.000Z" itemprop="datePublished"> 发表于 2015-06-18</time>
     
   </p>
 </header>
@@ -105,43 +121,41 @@ Brute force is a straightforward approach to solving a problem, usually directly
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#暴力求解(brute_force)"><span class="toc-number">1.</span> <span class="toc-text">暴力求解(brute force)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#排序问题的应用"><span class="toc-number">1.1.</span> <span class="toc-text">排序问题的应用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#搜索问题的应用"><span class="toc-number">1.2.</span> <span class="toc-text">搜索问题的应用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#几何问题"><span class="toc-number">1.3.</span> <span class="toc-text">几何问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#穷举搜索"><span class="toc-number">1.4.</span> <span class="toc-text">穷举搜索</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#总结"><span class="toc-number">1.5.</span> <span class="toc-text">总结</span></a></li></ol></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#什么是分治法"><span class="toc-number">1.</span> <span class="toc-text">什么是分治法</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#解决问题的流程"><span class="toc-number">1.1.</span> <span class="toc-text">解决问题的流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分治法适用情况"><span class="toc-number">1.2.</span> <span class="toc-text">分治法适用情况</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#应用问题"><span class="toc-number">1.3.</span> <span class="toc-text">应用问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#归并排序"><span class="toc-number">1.3.1.</span> <span class="toc-text">归并排序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#快速排序"><span class="toc-number">1.3.2.</span> <span class="toc-text">快速排序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二分搜索"><span class="toc-number">1.3.3.</span> <span class="toc-text">二分搜索</span></a></li></ol></li></ol></li></ol>
 		
 		</div>
 		
-		<h2 id="暴力求解(brute_force)">暴力求解(brute force)</h2><blockquote>
-<p>Brute force is a straightforward approach to solving a problem, usually directly based on the problem statement and definitions of the concepts involved.</p>
-</blockquote>
-<p>暴力求解即根据问题的描述和定义直接求解,不使用一些特殊的算法.</p>
-<h3 id="排序问题的应用">排序问题的应用</h3><ul>
-<li><p>选择排序<br>选择排序将数组分为排序与未排序两个部分,每次将从未排序部分取出最小的值,插入排序部分的最后,最终未排序部分消失,排序完成.</p>
-</li>
-<li><p>冒泡排序<br>冒泡排序也是将数组分为排序与未排序两个部分,每次从未排序部分的第一个数开始,与后一个比较,如果大于它两两交换,否则从第二个开始继续与后一个比较.最终未排序部分的最后一个数即最大的数.循环n次即完成排序.</p>
-</li>
-</ul>
-<h3 id="搜索问题的应用">搜索问题的应用</h3><ul>
-<li><p>线性搜索<br>简单粗暴,一个个比较.</p>
-</li>
-<li><p>字符串匹配<br>同样道理,逐个比较.</p>
-</li>
-</ul>
-<h3 id="几何问题">几何问题</h3><ul>
-<li><p>最近点问题<br>把所有两点距离求出来,然后选择最小值.</p>
-</li>
-<li><p>凸包问题<br>用循序渐进的方式求取给定点集的凸包，首先把最初输入的3个不共线(Non-collinear)的点按 逆时针方向构成一个三角形，这就是这3点的凸包。接着便会考察第4点，看看这个点是否位于前述三 角形之内或三角形的边上。若是，则这第4点并非凸包上的点，前述三角形保持不变。若否，则把这前述的三角 形扩大为一个四边形，并把不适用的边擦去。这个四边形便是这首4点的凸包。接着程序又会考察第5点，如此 类推，直至所有点均已被考察为止.由于每次都要检查所有之前的点，时间复杂度为O(n^2).</p>
-</li>
-</ul>
-<h3 id="穷举搜索">穷举搜索</h3><p>以下3个问题都可以用穷举的方法暴力求解,把所有可能都试一遍.然而实际上由于可能情况太多,一般不会使用穷举的方法.数据量小的情况可以考虑使用.每个问题都有不少更优的算法.</p>
-<ul>
-<li><p>旅行推销员问题(Travelling Salesman Problem)    有n个城市，一个推销员要从其中某一个城市出发，唯一走遍所有的城市，再回到他出发的城市，求最短的路线。也即求一个最短的哈密顿回路。</p>
-</li>
-<li><p>背包问题(knapsack problem)<br>给定一组物品，每种物品都有自己的重量和价格，在限定的总重量内，我们如何选择，才能使得物品的总价格最高。</p>
-</li>
-<li><p>任务分配问题(assignment problem)<br>线性任务分配问题：P是二元组(a, b)的集合，其中a和b分别是集合A和B中的元素。C是某一函数，并满足特定约束条件，例如：A的每一个元素必须在P中出现一次，或者B的每一个元素必须在P中出现一次，或者以上二者都必须满足。线性任务分配问题的目标就是最大化或者最小化C(a, b)之和。</p>
-</li>
-</ul>
-<h3 id="总结">总结</h3><pre><code>暴力求解法可以说毫无技巧,但是简单容易实现.一般情况是不会用到的,但是在特定情况下有奇效.可以说当人们解决某个问题的时候用暴力求解应该是第一直觉,然而这太简单并不能体现自己的能力,就会开始寻找更快的方法.我的理解是更优的算法应该是基于暴力求解法之上的.例如说背包问题,同样样遍历所有情况,动态规划巧妙的利用前面的尝试过的数据,减少了工作量.但本质上还是要试遍所有可能,只是试的少了.
-</code></pre>  
+		<h1 id="什么是分治法">什么是分治法</h1><p>字面上的解释是“分而治之”，就是把一个复杂的问题分成两个或更多的相同或相似的子问题，直到最后子问题可以简单的直接求解，原问题的解即子问题的解的合并。</p>
+<h2 id="解决问题的流程">解决问题的流程</h2><p><img src="/2015/06/18/算法学习之分治法-divide-and-conquer/00.png" alt="[divide and conquer]" title="[divide and conquer]">_</p>
+<h2 id="分治法适用情况">分治法适用情况</h2><pre><code>分治法所能解决的问题一般具有以下几个特征：
+
+<span class="bullet">1. </span>该问题的规模缩小到一定的程度就可以容易地解决
+
+<span class="bullet">2. </span>该问题可以分解为若干个规模较小的相同问题，即该问题具有最优子结构性质。
+
+<span class="bullet">3. </span>利用该问题分解出的子问题的解可以合并为该问题的解；
+
+<span class="bullet">4. </span>该问题所分解出的各个子问题是相互独立的，即子问题之间不包含公共的子子问题。
+</code></pre><p>第一条特征是绝大多数问题都可以满足的，因为问题的计算复杂性一般是随着问题规模的增加而增加；</p>
+<p>第二条特征是应用分治法的前提它也是大多数问题可以满足的，此特征反映了递归思想的应用；、</p>
+<p>第三条特征是关键，能否利用分治法完全取决于问题是否具有第三条特征，如果具备了第一条和第二条特征，而不具备第三条特征，则可以考虑用贪心法或动态规划法。</p>
+<p>第四条特征涉及到分治法的效率，如果各子问题是不独立的则分治法要做许多不必要的工作，重复地解公共的子问题，此时虽然可用分治法，但一般用动态规划法较好。</p>
+<h2 id="应用问题">应用问题</h2><h3 id="归并排序">归并排序</h3><p>可以看到排序问题正好满足以上提到的四个特征。<br>归并排序通过将待排序数组分为两个部分，递归地处理它们，最终将两个排序好的部分合并起来。<br>值得一提的是归并排序通过数组的下标分割子问题，即每次都把数组分为两半。</p>
+<p><strong>伪代码如下</strong><br>_</p>
+<p>_</p>
+<p><strong>例子</strong><br>_</p>
+<h3 id="快速排序">快速排序</h3><p>跟归并排序的思想是类似的，但是快速排序是根据值来分割子问题，即把数组根据一个值分为大于和小于它两个部分。</p>
+<p><strong>伪代码如下</strong></p>
+<p>_</p>
+<p>_</p>
+<p><strong>例子</strong></p>
+<p>_</p>
+<h3 id="二分搜索">二分搜索</h3><p>对一个有序的数组进行二分搜索，每次比较中间的值，key大于它说明在右边，小于说明左边。</p>
+<p><strong>伪代码如下</strong></p>
+<p>_</p>
+<p><strong>例子</strong></p>
+<p>_</p>
+  
 	</div>
 		<footer class="article-footer clearfix">
 <div class="article-catetags">
@@ -154,7 +168,7 @@ Brute force is a straightforward approach to solving a problem, usually directly
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/暴力求解/">暴力求解</a>
+  <span></span> <a href="/tags/分治法/">分治法</a>
   </div>
 
 </div>
@@ -163,7 +177,7 @@ Brute force is a straightforward approach to solving a problem, usually directly
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="https://github.com/x-hansong/2015/06/18/算法学习之暴力求解-brute-force/" data-title="算法学习之暴力求解(brute force) | ShareHub" data-tsina="null" class="share clearfix">
+	  <div data-url="https://github.com/x-hansong/2015/06/18/算法学习之分治法-divide-and-conquer/" data-title="算法学习之分治法(divide and conquer) | ShareHub" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -176,19 +190,11 @@ Brute force is a straightforward approach to solving a problem, usually directly
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2015/06/18/算法学习之分治法-divide-and-conquer/" title="算法学习之分治法(divide and conquer)">
-  <strong>上一篇：</strong><br/>
-  <span>
-  算法学习之分治法(divide and conquer)</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2015/06/18/算法基本概念/"  title="算法学习之算法基本概念">
+<a href="/2015/06/18/算法学习之暴力求解-brute-force/"  title="算法学习之暴力求解(brute force)">
  <strong>下一篇：</strong><br/> 
- <span>算法学习之算法基本概念
+ <span>算法学习之暴力求解(brute force)
 </span>
 </a>
 </div>
@@ -197,7 +203,7 @@ Brute force is a straightforward approach to solving a problem, usually directly
 
 	
 <section id="comments" class="comment">
-	<div class="ds-thread" data-thread-key="2015/06/18/算法学习之暴力求解-brute-force/" data-title="算法学习之暴力求解(brute force)" data-url="https://github.com/x-hansong/2015/06/18/算法学习之暴力求解-brute-force/"></div>
+	<div class="ds-thread" data-thread-key="2015/06/18/算法学习之分治法-divide-and-conquer/" data-title="算法学习之分治法(divide and conquer)" data-url="https://github.com/x-hansong/2015/06/18/算法学习之分治法-divide-and-conquer/"></div>
 </section>
 
 
@@ -207,7 +213,7 @@ Brute force is a straightforward approach to solving a problem, usually directly
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#暴力求解(brute_force)"><span class="toc-number">1.</span> <span class="toc-text">暴力求解(brute force)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#排序问题的应用"><span class="toc-number">1.1.</span> <span class="toc-text">排序问题的应用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#搜索问题的应用"><span class="toc-number">1.2.</span> <span class="toc-text">搜索问题的应用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#几何问题"><span class="toc-number">1.3.</span> <span class="toc-text">几何问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#穷举搜索"><span class="toc-number">1.4.</span> <span class="toc-text">穷举搜索</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#总结"><span class="toc-number">1.5.</span> <span class="toc-text">总结</span></a></li></ol></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#什么是分治法"><span class="toc-number">1.</span> <span class="toc-text">什么是分治法</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#解决问题的流程"><span class="toc-number">1.1.</span> <span class="toc-text">解决问题的流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分治法适用情况"><span class="toc-number">1.2.</span> <span class="toc-text">分治法适用情况</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#应用问题"><span class="toc-number">1.3.</span> <span class="toc-text">应用问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#归并排序"><span class="toc-number">1.3.1.</span> <span class="toc-text">归并排序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#快速排序"><span class="toc-number">1.3.2.</span> <span class="toc-text">快速排序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二分搜索"><span class="toc-number">1.3.3.</span> <span class="toc-text">二分搜索</span></a></li></ol></li></ol></li></ol>
  
   </div>
 

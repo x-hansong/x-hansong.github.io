@@ -5,7 +5,7 @@
   <subtitle><![CDATA[悲观的意志,乐观的头脑]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="https://github.com/x-hansong//"/>
-  <updated>2015-06-18T08:58:57.000Z</updated>
+  <updated>2015-06-18T11:47:06.000Z</updated>
   <id>https://github.com/x-hansong//</id>
   
   <author>
@@ -16,11 +16,59 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title><![CDATA[算法学习之分治法(divide and conquer)]]></title>
+    <link href="https://github.com/x-hansong/2015/06/18/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E4%B9%8B%E5%88%86%E6%B2%BB%E6%B3%95-divide-and-conquer/"/>
+    <id>https://github.com/x-hansong/2015/06/18/算法学习之分治法-divide-and-conquer/</id>
+    <published>2015-06-18T10:50:50.000Z</published>
+    <updated>2015-06-18T11:47:06.000Z</updated>
+    <content type="html"><![CDATA[<h1 id="什么是分治法">什么是分治法</h1><p>字面上的解释是“分而治之”，就是把一个复杂的问题分成两个或更多的相同或相似的子问题，直到最后子问题可以简单的直接求解，原问题的解即子问题的解的合并。</p>
+<h2 id="解决问题的流程">解决问题的流程</h2><p><img src="/2015/06/18/算法学习之分治法-divide-and-conquer/00.png" alt="[divide and conquer]" title="[divide and conquer]">_</p>
+<h2 id="分治法适用情况">分治法适用情况</h2><pre><code>分治法所能解决的问题一般具有以下几个特征：
+
+<span class="bullet">1. </span>该问题的规模缩小到一定的程度就可以容易地解决
+
+<span class="bullet">2. </span>该问题可以分解为若干个规模较小的相同问题，即该问题具有最优子结构性质。
+
+<span class="bullet">3. </span>利用该问题分解出的子问题的解可以合并为该问题的解；
+
+<span class="bullet">4. </span>该问题所分解出的各个子问题是相互独立的，即子问题之间不包含公共的子子问题。
+</code></pre><p>第一条特征是绝大多数问题都可以满足的，因为问题的计算复杂性一般是随着问题规模的增加而增加；</p>
+<p>第二条特征是应用分治法的前提它也是大多数问题可以满足的，此特征反映了递归思想的应用；、</p>
+<p>第三条特征是关键，能否利用分治法完全取决于问题是否具有第三条特征，如果具备了第一条和第二条特征，而不具备第三条特征，则可以考虑用贪心法或动态规划法。</p>
+<p>第四条特征涉及到分治法的效率，如果各子问题是不独立的则分治法要做许多不必要的工作，重复地解公共的子问题，此时虽然可用分治法，但一般用动态规划法较好。</p>
+<h2 id="应用问题">应用问题</h2><h3 id="归并排序">归并排序</h3><p>可以看到排序问题正好满足以上提到的四个特征。<br>归并排序通过将待排序数组分为两个部分，递归地处理它们，最终将两个排序好的部分合并起来。<br>值得一提的是归并排序通过数组的下标分割子问题，即每次都把数组分为两半。</p>
+<p><strong>伪代码如下</strong><br>_</p>
+<p>_</p>
+<p><strong>例子</strong><br>_</p>
+<h3 id="快速排序">快速排序</h3><p>跟归并排序的思想是类似的，但是快速排序是根据值来分割子问题，即把数组根据一个值分为大于和小于它两个部分。</p>
+<p><strong>伪代码如下</strong></p>
+<p>_</p>
+<p>_</p>
+<p><strong>例子</strong></p>
+<p>_</p>
+<h3 id="二分搜索">二分搜索</h3><p>对一个有序的数组进行二分搜索，每次比较中间的值，key大于它说明在右边，小于说明左边。</p>
+<p><strong>伪代码如下</strong></p>
+<p>_</p>
+<p><strong>例子</strong></p>
+<p>_</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<h1 id="什么是分治法">什么是分治法</h1><p>字面上的解释是“分而治之”，就是把一个复杂的问题分成两个或更多的相同或相似的子问题，直到最后子问题可以简单的直接求解，原问题的解即子问题的解的合并。</p>
+<h2 id="解决问题的流程">解决问题的流程</h2><p]]>
+    </summary>
+    
+      <category term="分治法" scheme="https://github.com/x-hansong/tags/%E5%88%86%E6%B2%BB%E6%B3%95/"/>
+    
+      <category term="算法学习" scheme="https://github.com/x-hansong/categories/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0/"/>
+    
+  </entry>
+  
+  <entry>
     <title><![CDATA[算法学习之暴力求解(brute force)]]></title>
     <link href="https://github.com/x-hansong/2015/06/18/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E4%B9%8B%E6%9A%B4%E5%8A%9B%E6%B1%82%E8%A7%A3-brute-force/"/>
     <id>https://github.com/x-hansong/2015/06/18/算法学习之暴力求解-brute-force/</id>
     <published>2015-06-18T08:53:51.000Z</published>
-    <updated>2015-06-18T08:58:57.000Z</updated>
+    <updated>2015-06-18T09:02:23.000Z</updated>
     <content type="html"><![CDATA[<h2 id="暴力求解(brute_force)">暴力求解(brute force)</h2><blockquote>
 <p>Brute force is a straightforward approach to solving a problem, usually directly based on the problem statement and definitions of the concepts involved.</p>
 </blockquote>
@@ -59,7 +107,7 @@
 <p>Brute force is a straightforward approach to solving a problem, usually dir]]>
     </summary>
     
-      <category term="暴力求解, 算法" scheme="https://github.com/x-hansong/tags/%E6%9A%B4%E5%8A%9B%E6%B1%82%E8%A7%A3-%E7%AE%97%E6%B3%95/"/>
+      <category term="暴力求解" scheme="https://github.com/x-hansong/tags/%E6%9A%B4%E5%8A%9B%E6%B1%82%E8%A7%A3/"/>
     
       <category term="算法学习" scheme="https://github.com/x-hansong/categories/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0/"/>
     
