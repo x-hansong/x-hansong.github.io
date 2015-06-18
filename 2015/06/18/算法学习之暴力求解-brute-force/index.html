@@ -4,54 +4,32 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>算法基本概念 | ShareHub</title>
+    <title>算法学习之暴力求解(brute force) | ShareHub</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="Yonah-潇">
     
 
     
-    <meta name="description" content="算法的定义
-An algorithm is a sequence of unambiguous instructions for solving a problem
+    <meta name="description" content="暴力求解(brute force)
+Brute force is a straightforward approach to solving a problem, usually directly based on the problem statement and definitions of the concepts involved.
 
-即算法是解决问题的无二义性的指令序列.简单说就是用来解决问题步骤.
-算法设计及实现流程
-重要的问题类型
-Sorting
-Searching
-String processing
-Graph problems
-Combinatorial">
+暴力求解即根据问题的描述和定义直接求解,不使用一些特殊">
 <meta property="og:type" content="article">
-<meta property="og:title" content="算法基本概念">
-<meta property="og:url" content="https://github.com/x-hansong/2015/06/18/算法基本概念/index.html">
+<meta property="og:title" content="算法学习之暴力求解(brute force)">
+<meta property="og:url" content="https://github.com/x-hansong/2015/06/18/算法学习之暴力求解-brute-force/index.html">
 <meta property="og:site_name" content="ShareHub">
-<meta property="og:description" content="算法的定义
-An algorithm is a sequence of unambiguous instructions for solving a problem
+<meta property="og:description" content="暴力求解(brute force)
+Brute force is a straightforward approach to solving a problem, usually directly based on the problem statement and definitions of the concepts involved.
 
-即算法是解决问题的无二义性的指令序列.简单说就是用来解决问题步骤.
-算法设计及实现流程
-重要的问题类型
-Sorting
-Searching
-String processing
-Graph problems
-Combinatorial">
-<meta property="og:image" content="http://img.blog.csdn.net/20150615181318512">
-<meta property="og:updated_time" content="2015-06-18T08:54:09.000Z">
+暴力求解即根据问题的描述和定义直接求解,不使用一些特殊">
+<meta property="og:updated_time" content="2015-06-18T08:56:24.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="算法基本概念">
-<meta name="twitter:description" content="算法的定义
-An algorithm is a sequence of unambiguous instructions for solving a problem
+<meta name="twitter:title" content="算法学习之暴力求解(brute force)">
+<meta name="twitter:description" content="暴力求解(brute force)
+Brute force is a straightforward approach to solving a problem, usually directly based on the problem statement and definitions of the concepts involved.
 
-即算法是解决问题的无二义性的指令序列.简单说就是用来解决问题步骤.
-算法设计及实现流程
-重要的问题类型
-Sorting
-Searching
-String processing
-Graph problems
-Combinatorial">
+暴力求解即根据问题的描述和定义直接求解,不使用一些特殊">
 
     
     <link rel="alternative" href="/atom.xml" title="ShareHub" type="application/atom+xml">
@@ -111,14 +89,14 @@ Combinatorial">
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/06/18/算法基本概念/" title="算法基本概念" itemprop="url">算法基本概念</a>
+      <a href="/2015/06/18/算法学习之暴力求解-brute-force/" title="算法学习之暴力求解(brute force)" itemprop="url">算法学习之暴力求解(brute force)</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Yonah-潇" target="_blank" itemprop="author">Yonah-潇</a>
 		
   <p class="article-time">
-    <time datetime="2015-06-18T08:18:24.000Z" itemprop="datePublished"> 发表于 2015-06-18</time>
+    <time datetime="2015-06-18T08:53:51.000Z" itemprop="datePublished"> 发表于 2015-06-18</time>
     
   </p>
 </header>
@@ -127,51 +105,43 @@ Combinatorial">
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#算法的定义"><span class="toc-number">1.</span> <span class="toc-text">算法的定义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#算法设计及实现流程"><span class="toc-number">2.</span> <span class="toc-text">算法设计及实现流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#重要的问题类型"><span class="toc-number">3.</span> <span class="toc-text">重要的问题类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#基础数据结构"><span class="toc-number">4.</span> <span class="toc-text">基础数据结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#常用的算法思想"><span class="toc-number">5.</span> <span class="toc-text">常用的算法思想</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#暴力求解(brute_force)"><span class="toc-number">1.</span> <span class="toc-text">暴力求解(brute force)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#排序问题的应用"><span class="toc-number">1.1.</span> <span class="toc-text">排序问题的应用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#搜索问题的应用"><span class="toc-number">1.2.</span> <span class="toc-text">搜索问题的应用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#几何问题"><span class="toc-number">1.3.</span> <span class="toc-text">几何问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#穷举搜索"><span class="toc-number">1.4.</span> <span class="toc-text">穷举搜索</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#总结"><span class="toc-number">1.5.</span> <span class="toc-text">总结</span></a></li></ol></li></ol>
 		
 		</div>
 		
-		<h2 id="算法的定义">算法的定义</h2><blockquote>
-<p>An algorithm is a sequence of unambiguous instructions for solving a problem</p>
+		<h2 id="暴力求解(brute_force)">暴力求解(brute force)</h2><blockquote>
+<p>Brute force is a straightforward approach to solving a problem, usually directly based on the problem statement and definitions of the concepts involved.</p>
 </blockquote>
-<p>即算法是解决问题的无二义性的指令序列.简单说就是用来解决问题步骤.</p>
-<h2 id="算法设计及实现流程">算法设计及实现流程</h2><p><img src="http://img.blog.csdn.net/20150615181318512" alt="算法设计及实现流程"></p>
-<h2 id="重要的问题类型">重要的问题类型</h2><ul>
-<li>Sorting</li>
-<li>Searching</li>
-<li>String processing</li>
-<li>Graph problems</li>
-<li>Combinatorial problems</li>
-<li>Geometric problems</li>
-<li>Numerical Problems</li>
-</ul>
-<h2 id="基础数据结构">基础数据结构</h2><ul>
-<li>linear data structure<ul>
-<li>array</li>
-<li>list</li>
-<li>stack</li>
-<li>queue</li>
-</ul>
+<p>暴力求解即根据问题的描述和定义直接求解,不使用一些特殊的算法.</p>
+<h3 id="排序问题的应用">排序问题的应用</h3><ul>
+<li><p>选择排序<br>选择排序将数组分为排序与未排序两个部分,每次将从未排序部分取出最小的值,插入排序部分的最后,最终未排序部分消失,排序完成.</p>
 </li>
-<li>graphs</li>
-<li>tree</li>
-<li>set and dictionaries</li>
-</ul>
-<h2 id="常用的算法思想">常用的算法思想</h2><ul>
-<li>Brute force (暴力求解)</li>
-<li>Divide and conquer (分治法)</li>
-<li>Decrease and conquer (减治法)</li>
-<li>Transform and conquer (转治法)</li>
-<li>Space and time tradeoffs (时空权衡)</li>
-<li>Greedy approach (贪婪算法)</li>
-<li>Dynamic programming (动态规划)</li>
-<li>Iterative improvement (迭代改进)</li>
-<li>Backtracking (回溯法)</li>
-<li><p>Branch and bound (分支界限法)</p>
-<p>  基本上,算法就是围绕上面提到的问题和数据结构进行研究,遇到某个问题时,先分析问题,确定问题类型和使用的数据结构,有利于快速找到头绪.</p>
+<li><p>冒泡排序<br>冒泡排序也是将数组分为排序与未排序两个部分,每次从未排序部分的第一个数开始,与后一个比较,如果大于它两两交换,否则从第二个开始继续与后一个比较.最终未排序部分的最后一个数即最大的数.循环n次即完成排序.</p>
 </li>
 </ul>
-  
+<h3 id="搜索问题的应用">搜索问题的应用</h3><ul>
+<li><p>线性搜索<br>简单粗暴,一个个比较.</p>
+</li>
+<li><p>字符串匹配<br>同样道理,逐个比较.</p>
+</li>
+</ul>
+<h3 id="几何问题">几何问题</h3><ul>
+<li><p>最近点问题<br>把所有两点距离求出来,然后选择最小值.</p>
+</li>
+<li><p>凸包问题<br>用循序渐进的方式求取给定点集的凸包，首先把最初输入的3个不共线(Non-collinear)的点按 逆时针方向构成一个三角形，这就是这3点的凸包。接着便会考察第4点，看看这个点是否位于前述三 角形之内或三角形的边上。若是，则这第4点并非凸包上的点，前述三角形保持不变。若否，则把这前述的三角 形扩大为一个四边形，并把不适用的边擦去。这个四边形便是这首4点的凸包。接着程序又会考察第5点，如此 类推，直至所有点均已被考察为止.由于每次都要检查所有之前的点，时间复杂度为O(n^2).</p>
+</li>
+</ul>
+<h3 id="穷举搜索">穷举搜索</h3><p>以下3个问题都可以用穷举的方法暴力求解,把所有可能都试一遍.然而实际上由于可能情况太多,一般不会使用穷举的方法.数据量小的情况可以考虑使用.每个问题都有不少更优的算法.</p>
+<ul>
+<li><p>旅行推销员问题(Travelling Salesman Problem)    有n个城市，一个推销员要从其中某一个城市出发，唯一走遍所有的城市，再回到他出发的城市，求最短的路线。也即求一个最短的哈密顿回路。</p>
+</li>
+<li><p>背包问题(knapsack problem)<br>给定一组物品，每种物品都有自己的重量和价格，在限定的总重量内，我们如何选择，才能使得物品的总价格最高。</p>
+</li>
+<li><p>任务分配问题(assignment problem)<br>线性任务分配问题：P是二元组(a, b)的集合，其中a和b分别是集合A和B中的元素。C是某一函数，并满足特定约束条件，例如：A的每一个元素必须在P中出现一次，或者B的每一个元素必须在P中出现一次，或者以上二者都必须满足。线性任务分配问题的目标就是最大化或者最小化C(a, b)之和。</p>
+</li>
+</ul>
+<h3 id="总结">总结</h3><pre><code>暴力求解法可以说毫无技巧,但是简单容易实现.一般情况是不会用到的,但是在特定情况下有奇效.可以说当人们解决某个问题的时候用暴力求解应该是第一直觉,然而这太简单并不能体现自己的能力,就会开始寻找更快的方法.我的理解是更优的算法应该是基于暴力求解法之上的.例如说背包问题,同样样遍历所有情况,动态规划巧妙的利用前面的尝试过的数据,减少了工作量.但本质上还是要试遍所有可能,只是试的少了.
+</code></pre>  
 	</div>
 		<footer class="article-footer clearfix">
 <div class="article-catetags">
@@ -184,7 +154,7 @@ Combinatorial">
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/算法/">算法</a>
+  <span></span> <a href="/tags/暴力求解-算法/">暴力求解 算法</a>
   </div>
 
 </div>
@@ -193,7 +163,7 @@ Combinatorial">
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="https://github.com/x-hansong/2015/06/18/算法基本概念/" data-title="算法基本概念 | ShareHub" data-tsina="null" class="share clearfix">
+	  <div data-url="https://github.com/x-hansong/2015/06/18/算法学习之暴力求解-brute-force/" data-title="算法学习之暴力求解(brute force) | ShareHub" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -206,19 +176,11 @@ Combinatorial">
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2015/06/18/算法学习之暴力求解-brute-force/" title="算法学习之暴力求解(brute force)">
-  <strong>上一篇：</strong><br/>
-  <span>
-  算法学习之暴力求解(brute force)</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2015/06/17/用hexo搭建github博客/"  title="用hexo搭建github博客">
+<a href="/2015/06/18/算法基本概念/"  title="算法基本概念">
  <strong>下一篇：</strong><br/> 
- <span>用hexo搭建github博客
+ <span>算法基本概念
 </span>
 </a>
 </div>
@@ -227,7 +189,7 @@ Combinatorial">
 
 	
 <section id="comments" class="comment">
-	<div class="ds-thread" data-thread-key="2015/06/18/算法基本概念/" data-title="算法基本概念" data-url="https://github.com/x-hansong/2015/06/18/算法基本概念/"></div>
+	<div class="ds-thread" data-thread-key="2015/06/18/算法学习之暴力求解-brute-force/" data-title="算法学习之暴力求解(brute force)" data-url="https://github.com/x-hansong/2015/06/18/算法学习之暴力求解-brute-force/"></div>
 </section>
 
 
@@ -237,7 +199,7 @@ Combinatorial">
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#算法的定义"><span class="toc-number">1.</span> <span class="toc-text">算法的定义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#算法设计及实现流程"><span class="toc-number">2.</span> <span class="toc-text">算法设计及实现流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#重要的问题类型"><span class="toc-number">3.</span> <span class="toc-text">重要的问题类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#基础数据结构"><span class="toc-number">4.</span> <span class="toc-text">基础数据结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#常用的算法思想"><span class="toc-number">5.</span> <span class="toc-text">常用的算法思想</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#暴力求解(brute_force)"><span class="toc-number">1.</span> <span class="toc-text">暴力求解(brute force)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#排序问题的应用"><span class="toc-number">1.1.</span> <span class="toc-text">排序问题的应用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#搜索问题的应用"><span class="toc-number">1.2.</span> <span class="toc-text">搜索问题的应用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#几何问题"><span class="toc-number">1.3.</span> <span class="toc-text">几何问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#穷举搜索"><span class="toc-number">1.4.</span> <span class="toc-text">穷举搜索</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#总结"><span class="toc-number">1.5.</span> <span class="toc-text">总结</span></a></li></ol></li></ol>
  
   </div>
 

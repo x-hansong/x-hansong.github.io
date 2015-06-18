@@ -5,7 +5,7 @@
   <subtitle><![CDATA[悲观的意志,乐观的头脑]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="https://github.com/x-hansong//"/>
-  <updated>2015-06-18T08:36:22.000Z</updated>
+  <updated>2015-06-18T08:56:24.000Z</updated>
   <id>https://github.com/x-hansong//</id>
   
   <author>
@@ -16,11 +16,61 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title><![CDATA[算法学习之暴力求解(brute force)]]></title>
+    <link href="https://github.com/x-hansong/2015/06/18/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E4%B9%8B%E6%9A%B4%E5%8A%9B%E6%B1%82%E8%A7%A3-brute-force/"/>
+    <id>https://github.com/x-hansong/2015/06/18/算法学习之暴力求解-brute-force/</id>
+    <published>2015-06-18T08:53:51.000Z</published>
+    <updated>2015-06-18T08:56:24.000Z</updated>
+    <content type="html"><![CDATA[<h2 id="暴力求解(brute_force)">暴力求解(brute force)</h2><blockquote>
+<p>Brute force is a straightforward approach to solving a problem, usually directly based on the problem statement and definitions of the concepts involved.</p>
+</blockquote>
+<p>暴力求解即根据问题的描述和定义直接求解,不使用一些特殊的算法.</p>
+<h3 id="排序问题的应用">排序问题的应用</h3><ul>
+<li><p>选择排序<br>选择排序将数组分为排序与未排序两个部分,每次将从未排序部分取出最小的值,插入排序部分的最后,最终未排序部分消失,排序完成.</p>
+</li>
+<li><p>冒泡排序<br>冒泡排序也是将数组分为排序与未排序两个部分,每次从未排序部分的第一个数开始,与后一个比较,如果大于它两两交换,否则从第二个开始继续与后一个比较.最终未排序部分的最后一个数即最大的数.循环n次即完成排序.</p>
+</li>
+</ul>
+<h3 id="搜索问题的应用">搜索问题的应用</h3><ul>
+<li><p>线性搜索<br>简单粗暴,一个个比较.</p>
+</li>
+<li><p>字符串匹配<br>同样道理,逐个比较.</p>
+</li>
+</ul>
+<h3 id="几何问题">几何问题</h3><ul>
+<li><p>最近点问题<br>把所有两点距离求出来,然后选择最小值.</p>
+</li>
+<li><p>凸包问题<br>用循序渐进的方式求取给定点集的凸包，首先把最初输入的3个不共线(Non-collinear)的点按 逆时针方向构成一个三角形，这就是这3点的凸包。接着便会考察第4点，看看这个点是否位于前述三 角形之内或三角形的边上。若是，则这第4点并非凸包上的点，前述三角形保持不变。若否，则把这前述的三角 形扩大为一个四边形，并把不适用的边擦去。这个四边形便是这首4点的凸包。接着程序又会考察第5点，如此 类推，直至所有点均已被考察为止.由于每次都要检查所有之前的点，时间复杂度为O(n^2).</p>
+</li>
+</ul>
+<h3 id="穷举搜索">穷举搜索</h3><p>以下3个问题都可以用穷举的方法暴力求解,把所有可能都试一遍.然而实际上由于可能情况太多,一般不会使用穷举的方法.数据量小的情况可以考虑使用.每个问题都有不少更优的算法.</p>
+<ul>
+<li><p>旅行推销员问题(Travelling Salesman Problem)    有n个城市，一个推销员要从其中某一个城市出发，唯一走遍所有的城市，再回到他出发的城市，求最短的路线。也即求一个最短的哈密顿回路。</p>
+</li>
+<li><p>背包问题(knapsack problem)<br>给定一组物品，每种物品都有自己的重量和价格，在限定的总重量内，我们如何选择，才能使得物品的总价格最高。</p>
+</li>
+<li><p>任务分配问题(assignment problem)<br>线性任务分配问题：P是二元组(a, b)的集合，其中a和b分别是集合A和B中的元素。C是某一函数，并满足特定约束条件，例如：A的每一个元素必须在P中出现一次，或者B的每一个元素必须在P中出现一次，或者以上二者都必须满足。线性任务分配问题的目标就是最大化或者最小化C(a, b)之和。</p>
+</li>
+</ul>
+<h3 id="总结">总结</h3><pre><code>暴力求解法可以说毫无技巧,但是简单容易实现.一般情况是不会用到的,但是在特定情况下有奇效.可以说当人们解决某个问题的时候用暴力求解应该是第一直觉,然而这太简单并不能体现自己的能力,就会开始寻找更快的方法.我的理解是更优的算法应该是基于暴力求解法之上的.例如说背包问题,同样样遍历所有情况,动态规划巧妙的利用前面的尝试过的数据,减少了工作量.但本质上还是要试遍所有可能,只是试的少了.
+</code></pre>]]></content>
+    <summary type="html">
+    <![CDATA[<h2 id="暴力求解(brute_force)">暴力求解(brute force)</h2><blockquote>
+<p>Brute force is a straightforward approach to solving a problem, usually dir]]>
+    </summary>
+    
+      <category term="暴力求解 算法" scheme="https://github.com/x-hansong/tags/%E6%9A%B4%E5%8A%9B%E6%B1%82%E8%A7%A3-%E7%AE%97%E6%B3%95/"/>
+    
+      <category term="算法学习" scheme="https://github.com/x-hansong/categories/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0/"/>
+    
+  </entry>
+  
+  <entry>
     <title><![CDATA[算法基本概念]]></title>
     <link href="https://github.com/x-hansong/2015/06/18/%E7%AE%97%E6%B3%95%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/"/>
     <id>https://github.com/x-hansong/2015/06/18/算法基本概念/</id>
     <published>2015-06-18T08:18:24.000Z</published>
-    <updated>2015-06-18T08:36:22.000Z</updated>
+    <updated>2015-06-18T08:54:09.000Z</updated>
     <content type="html"><![CDATA[<h2 id="算法的定义">算法的定义</h2><blockquote>
 <p>An algorithm is a sequence of unambiguous instructions for solving a problem</p>
 </blockquote>
