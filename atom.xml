@@ -5,7 +5,7 @@
   <subtitle><![CDATA[悲观的意志,乐观的头脑]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="https://github.com/x-hansong//"/>
-  <updated>2015-06-19T05:49:41.000Z</updated>
+  <updated>2015-06-22T04:36:50.000Z</updated>
   <id>https://github.com/x-hansong//</id>
   
   <author>
@@ -16,11 +16,80 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title><![CDATA[算法学习之减治法(decrease and conquer)]]></title>
+    <link href="https://github.com/x-hansong/2015/06/22/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E4%B9%8B%E5%87%8F%E6%B2%BB%E6%B3%95-decrease-and-conquer/"/>
+    <id>https://github.com/x-hansong/2015/06/22/算法学习之减治法-decrease-and-conquer/</id>
+    <published>2015-06-22T02:55:13.000Z</published>
+    <updated>2015-06-22T04:36:50.000Z</updated>
+    <content type="html"><![CDATA[<h1 id="什么是分治法">什么是分治法</h1><p>减治技术利用了一个问题给定实例的解和同样问题较小实例的解之间的某种关系。一旦建立了这种关系，就可以从顶至下递归的来用该关系，也可以从底至上非递归的来运用该关系：</p>
+<ol>
+<li>减去一个常量</li>
+<li>减去一个常量因子</li>
+<li>减去的规模是可变的</li>
+</ol>
+<h1 id="分治法例子">分治法例子</h1><h2 id="减去一个常量">减去一个常量</h2><h3 id="拓扑排序">拓扑排序</h3><h4 id="定义">定义</h4><p>定义：将有向图中的顶点以线性方式进行排序。即对于任何连接自顶点u到顶点v的有向边uv，在最后的排序结果中，顶点u总是在顶点v的前面。</p>
+<h4 id="两张实现算法">两张实现算法</h4><h5 id="Kahn算法">Kahn算法</h5><pre><code><span class="keyword">L</span>← Empty <span class="keyword">list</span> that will contain the sorted elements
+S ← <span class="keyword">Set</span> of all nodes with <span class="keyword">no</span> incoming edges
+<span class="keyword">while</span> S is non-empty <span class="keyword">do</span>
+    remove a node <span class="keyword">n</span> from <span class="literal">S</span>
+    insert <span class="keyword">n</span> into <span class="keyword">L</span>
+    <span class="keyword">foreach</span> node <span class="keyword">m</span> with <span class="keyword">an</span> edge <span class="keyword">e</span> from <span class="keyword">n</span> to <span class="keyword">m</span> <span class="keyword">do</span>
+        remove edge <span class="keyword">e</span> from the <span class="keyword">graph</span>
+        <span class="keyword">if</span> <span class="keyword">m</span> has <span class="keyword">no</span> other incoming edges then
+            insert <span class="keyword">m</span> into <span class="literal">S</span>
+<span class="keyword">if</span> <span class="keyword">graph</span> has edges then
+    <span class="keyword">return</span> <span class="keyword">error</span> (<span class="keyword">graph</span> has at least onecycle)
+<span class="keyword">else</span> 
+    <span class="keyword">return</span> <span class="keyword">L</span> (a topologically sortedorder)
+</code></pre><p>不难看出该算法的实现十分直观，关键在于需要维护一个入度为0的顶点的集合：<br>每次从该集合中取出(没有特殊的取出规则，随机取出也行，使用队列/栈也行，下同)一个顶点，将该顶点放入保存结果的List中。<br>紧接着循环遍历由该顶点引出的所有边，从图中移除这条边，同时获取该边的另外一个顶点，如果该顶点的入度在减去本条边之后为0，那么也将这个顶点放到入度为0的集合中。然后继续从集合中取出一个顶点…………</p>
+<p>当集合为空之后，检查图中是否还存在任何边，如果存在的话，说明图中至少存在一条环路。不存在的话则返回结果List，此List中的顺序就是对图进行拓扑排序的结果。</p>
+<img src="/2015/06/22/算法学习之减治法-decrease-and-conquer/00.png" alt="[例子]" title="[例子]">
+<p>对上图进行拓扑排序的结果：<br>2-&gt;8-&gt;0-&gt;3-&gt;7-&gt;1-&gt;5-&gt;6-&gt;9-&gt;4-&gt;11-&gt;10-&gt;12</p>
+<p><strong>复杂度分析：</strong><br>初始化入度为0的集合需要遍历整张图，检查每个节点和每条边，因此复杂度为O(E+V);<br>然后对该集合进行操作，又需要遍历整张图中的，每条边，复杂度也为O(E+V);<br>因此Kahn算法的复杂度即为O(E+V)。</p>
+<h5 id="基于DFS的拓扑排序">基于DFS的拓扑排序</h5><pre><code><span class="keyword">L</span> ← Empty <span class="keyword">list</span> that will contain the sorted nodes
+S ← <span class="keyword">Set</span> of all nodes with <span class="keyword">no</span> outgoing edges
+<span class="keyword">for</span> each node <span class="keyword">n</span> <span class="keyword">in</span> S <span class="keyword">do</span>
+    visit(<span class="keyword">n</span>) 
+function visit(node <span class="keyword">n</span>)
+    <span class="keyword">if</span> <span class="keyword">n</span> has not been visited yet then
+        <span class="keyword">mark</span> <span class="keyword">n</span> <span class="keyword">as</span> visited
+        <span class="keyword">for</span> each node <span class="keyword">m</span> with <span class="keyword">an</span> edge from <span class="keyword">m</span> to ndo
+            visit(<span class="keyword">m</span>)
+        add <span class="keyword">n</span> to <span class="keyword">L</span>
+</code></pre><p>DFS的实现更加简单直观，使用递归实现。利用DFS实现拓扑排序，实际上只需要添加一行代码，即上面伪码中的最后一行：add n to L。<br>需要注意的是，将顶点添加到结果List中的时机是在visit方法即将退出之时。<br>这个算法的实现非常简单，但是要理解的话就相对复杂一点。<br>关键在于为什么在visit方法的最后将该顶点添加到一个集合中，就能保证这个集合就是拓扑排序的结果呢？<br>因为添加顶点到集合中的时机是在dfs方法即将退出之时，而dfs方法本身是个递归方法，只要当前顶点还存在边指向其它任何顶点，它就会递归调用dfs方法，而不会退出。因此，退出dfs方法，意味着当前顶点没有指向其它顶点的边了，即当前顶点是一条路径上的最后一个顶点。</p>
+<p><strong>复杂度分析：</strong><br>复杂度同DFS一致，即O(E+V)。具体而言，首先需要保证图是有向无环图，判断图是DAG可以使用基于DFS的算法，复杂度为O(E+V)，而后面的拓扑排序也是依赖于DFS，复杂度为O(E+V)</p>
+<p>还是对上文中的那张有向图进行拓扑排序，只不过这次使用的是基于DFS的算法，结果是：<br>8-&gt;7-&gt;2-&gt;3-&gt;0-&gt;6-&gt;9-&gt;10-&gt;11-&gt;12-&gt;1-&gt;5-&gt;4</p>
+<h5 id="两种实现算法的总结">两种实现算法的总结</h5><p>这两种算法分别使用链表和栈来表示结果集。<br>对于基于DFS的算法，加入结果集的条件是：顶点的出度为0。这个条件和Kahn算法中入度为0的顶点集合似乎有着异曲同工之妙，这两种算法的思想犹如一枚硬币的两面，看似矛盾，实则不然。一个是从入度的角度来构造结果集，另一个则是从出度的角度来构造。</p>
+<p>实现上的一些不同之处：<br>Kahn算法不需要检测图为DAG，如果图为DAG，那么在出度为0的集合为空之后，图中还存在没有被移除的边，这就说明了图中存在环路。<br>而基于DFS的算法需要首先确定图为DAG，当然也能够做出适当调整，让环路的检测和拓扑排序同时进行，毕竟环路检测也能够在DFS的基础上进行。<br>二者的复杂度均为O(V+E)。</p>
+<h2 id="减去一个常量因子">减去一个常量因子</h2><h3 id="Russian_Peasant_Multiplication">Russian Peasant Multiplication</h3><p>计算两个整数的积</p>
+<h4 id="原理">原理</h4><p>n * m = n/2 * m  n为偶数<br>n * m  = (n-1)/2 * 2m + m  (if n &gt; 1  and m if n = 1) n为奇数</p>
+<h4 id="例子">例子</h4><img src="/2015/06/22/算法学习之减治法-decrease-and-conquer/01.png" alt="[例子]" title="[例子]">
+<h2 id="减去的规模是可变的">减去的规模是可变的</h2><h3 id="Selection_Problem">Selection Problem</h3><p>找出数组中第n小的数</p>
+<h4 id="原理-1">原理</h4><p>类似与快速排序,只是把key换做数组的下标,通过数的下标作为分割的依据</p>
+<h4 id="例子-1">例子</h4><img src="/2015/06/22/算法学习之减治法-decrease-and-conquer/02.png" alt="[例子]" title="[例子]">
+<p><strong>参考资料:</strong><br><a href="http://www.cnblogs.com/kkgreen/archive/2011/06/17/2083915.html" target="_blank" rel="external">减治法（一）</a><br><a href="http://blog.csdn.net/dm_vincent/article/details/7714519" target="_blank" rel="external">拓扑排序的原理及其实现</a></p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<h1 id="什么是分治法">什么是分治法</h1><p>减治技术利用了一个问题给定实例的解和同样问题较小实例的解之间的某种关系。一旦建立了这种关系，就可以从顶至下递归的来用该关系，也可以从底至上非递归的来运用该关系：</p>
+<ol>
+<li>减去一个常量</li>
+<li>]]>
+    </summary>
+    
+      <category term="减治法" scheme="https://github.com/x-hansong/tags/%E5%87%8F%E6%B2%BB%E6%B3%95/"/>
+    
+      <category term="算法" scheme="https://github.com/x-hansong/tags/%E7%AE%97%E6%B3%95/"/>
+    
+      <category term="算法学习" scheme="https://github.com/x-hansong/categories/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0/"/>
+    
+  </entry>
+  
+  <entry>
     <title><![CDATA[算法学习之分治法(divide and conquer)]]></title>
     <link href="https://github.com/x-hansong/2015/06/18/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E4%B9%8B%E5%88%86%E6%B2%BB%E6%B3%95-divide-and-conquer/"/>
     <id>https://github.com/x-hansong/2015/06/18/算法学习之分治法-divide-and-conquer/</id>
     <published>2015-06-18T10:50:50.000Z</published>
-    <updated>2015-06-19T05:49:41.000Z</updated>
+    <updated>2015-06-19T18:07:31.000Z</updated>
     <content type="html"><![CDATA[<h2 id="什么是分治法">什么是分治法</h2><p>字面上的解释是“分而治之”，就是把一个复杂的问题分成两个或更多的相同或相似的子问题，直到最后子问题可以简单的直接求解，原问题的解即子问题的解的合并。</p>
 <h2 id="解决问题的流程">解决问题的流程</h2><img src="/2015/06/18/算法学习之分治法-divide-and-conquer/00.png" alt="[divide and conquer]" title="[divide and conquer]">
 <h2 id="分治法适用情况">分治法适用情况</h2><pre><code>分治法所能解决的问题一般具有以下几个特征：
@@ -196,7 +265,7 @@
     <link href="https://github.com/x-hansong/2015/06/17/%E7%94%A8hexo%E6%90%AD%E5%BB%BAgithub%E5%8D%9A%E5%AE%A2/"/>
     <id>https://github.com/x-hansong/2015/06/17/用hexo搭建github博客/</id>
     <published>2015-06-17T02:14:18.000Z</published>
-    <updated>2015-06-19T05:52:52.000Z</updated>
+    <updated>2015-06-19T06:27:32.000Z</updated>
     <content type="html"><![CDATA[<h1 id="背景">背景</h1><p><strong>搭建环境:Linux,nodejs,npm,git</strong></p>
 <p>现在网上已经有很多关于搭建hexo github博客的文章,我自己也是参考别人的文章过来的,但是现在hexo已经到了3.0版本,很多教程都过时了,而且感觉他们教程的思路着重于怎么做,并没有说明背后的原因,所以我希望写一篇着重于<strong>为什么</strong>,而不是怎么做的文章.我相信只有理解背后的原理才能更好更快的上手.</p>
 <p>其次,最好的教程就是官方文档,所以在这篇文章我引用的都是官方文档的内容,而且只是提供思路,不提供详细步骤.因为版本更新之后,操作是不一样的,官方文档会随时更新,但是这篇文章不一定会随时更新,然而思路是不变的,所以我极力推荐大家首先阅读官方文档.</p>
@@ -270,6 +339,7 @@ npm <span class="keyword">install</span> hexo-generator-sitemap@<span class="num
 <pre><code>npm <span class="operator"><span class="keyword">install</span> hexo-deployer-git <span class="comment">--save</span></span>
 </code></pre><p>因为hexo3.0把它插件化了,然后我在官方文档找到了答案.<br><strong>最后提示一下：如果运行命令出现什么问题，加上sudo试试看看，里面有些需要root权限</strong></p>
 <p>仅以此文记录折腾hexo的过程,并且希望给后来者有参考价值.</p>
+<p>最后推荐一篇极其详细的使用hexo的文章<a href="http://ibruce.info/2013/11/22/hexo-your-blog/" target="_blank" rel="external">hexo你的博客</a><br><em>里面的搭建流程是hexo2.0的,最好参考官方文档3.0的方法</em></p>
 ]]></content>
     <summary type="html">
     <![CDATA[<h1 id="背景">背景</h1><p><strong>搭建环境:Linux,nodejs,npm,git</strong></p>
