@@ -5,7 +5,7 @@
   <subtitle><![CDATA[悲观的意志,乐观的头脑]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="https://github.com/x-hansong//"/>
-  <updated>2015-06-22T04:36:50.000Z</updated>
+  <updated>2015-07-29T07:01:45.000Z</updated>
   <id>https://github.com/x-hansong//</id>
   
   <author>
@@ -16,11 +16,126 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title><![CDATA[理解链接之链接的基本概念]]></title>
+    <link href="https://github.com/x-hansong/2015/07/19/%E9%93%BE%E6%8E%A5%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/"/>
+    <id>https://github.com/x-hansong/2015/07/19/链接的基本概念/</id>
+    <published>2015-07-19T05:29:13.000Z</published>
+    <updated>2015-07-29T07:01:45.000Z</updated>
+    <content type="html"><![CDATA[<h1 id="前言">前言</h1><p>我们知道，开发程序的基本流程是：设计-代码编写-编译-链接-执行</p>
+<p>每一个步骤展开都是一个很大的课题，链接是一个被人忽略的课题，因为它并不是很复杂，相对于编译来说它还是比较简单的，但是并不代表它不重要。<br>现在编译链接的环节基本上由IDE帮助我们完成了，于是我们很少关注编译链接。虽然说不懂编译链接对开发程序并没有很大影响，但是如果要成为大牛，计算机底层的知识还是要掌握的。<br>编译的知识很多，不是几篇文章能说完的，推荐看《编译原理》。</p>
+<p>这篇文章以及几篇相关的文章将参考《深入理解计算机系统》这本书，对链接作一些介绍。</p>
+<h1 id="链接的基本概念">链接的基本概念</h1><blockquote>
+<p>链接(linking)就是将不同部分的代码和数据收集和组合成为一个单一文件的过程，这个文件可被加载或拷贝到内存并执行。</p>
+</blockquote>
+<p>简单来说，就是把程序用到的所有源文件的目标文件合成一个可执行目标文件，是一个“多合一”的过程。</p>
+<p>链接的执行时机包括：</p>
+<ul>
+<li><strong>编译时</strong>：源代码被翻译为机器码的时候。</li>
+<li><strong>加载时</strong>：程序被加载器加载到内存并执行的时候。</li>
+<li><strong>运行时</strong>：由应用程序执行。</li>
+</ul>
+<p>在早期计算机系统中，链接是手动执行的。在现代计算机系统中，链接是由链接器自动执行的。</p>
+<h1 id="链接的意义">链接的意义</h1><p>链接器在软件开发中扮演了关键的角色，它使得分离编译成为可能。我们不用将一个大小的应用程序组织成一个巨大的源文件，而是可以把它分解成为更小的，更好管理的模块，可以独立的修改和编译这些模块，最终由链接器链接成为一个可执行文件。</p>
+<h1 id="为什么要学习链接的知识">为什么要学习链接的知识</h1><p>链接通常是由链接器处理的，不需要我们插手。但是这是在没有错误产生的情况下，一旦错误产生，不理解链接的工作过程和知识，我们就无法排除错误。以下列出学习链接的几个理由：</p>
+<ul>
+<li><strong>理解链接器将帮助你构造大型程序</strong>。构造大型程序的程序员经常会遇到由于缺少模块，库和不兼容库版本引起的链接器错误。除非你理解链接器是如何解析引用，什么是库，以及链接器是如何使用库来解析引用的，否则你无处着手处理错误。</li>
+<li><strong>理解链接器将帮助你避免一些危险的编程错误</strong>。默认情况下，乱用全局变量在链接时是不会产生警告的，这样的错误难以调试。理解链接器将让你知道原因，如何避免。</li>
+<li><strong>理解链接将帮助你理解语言的作用域规则是如何实现的</strong>。</li>
+<li><strong>理解链接将帮助你理解其他重要的系统概念</strong>。</li>
+<li><strong>理解链接将使你能够开发共享库</strong>。</li>
+</ul>
+<h1 id="简单的链接过程">简单的链接过程</h1><p>来看一个简单的静态链接过程，对链接有一个感性的认识。</p>
+<img src="/2015/07/19/链接的基本概念/00.png" alt="[static linking]" title="[static linking]">
+<p>源代码经过编译器翻译为汇编语言文件，再经过汇编器翻译为可重定向目标文件，最后由链接器链接为可执行目标文件。<br>(ccl:C编译器, as:汇编器, ld:链接器)</p>
+<p>为了创建可执行文件，链接器要完成两个任务：</p>
+<ul>
+<li><strong>符号解析</strong>。目标文件定义和引用符号。符号解析的目的是将每个符号引用和一个符号定义联系起来。</li>
+<li><strong>重定位</strong>。编译器和汇编器生产从地址零开始的代码和数据节。链接器通过把每个符号定义与一个存储器地址联系起来，然后修改所有对这些符号的引用，使得它们指向这个存储器地址，从而重定位这些节。</li>
+</ul>
+<h1 id="目标文件">目标文件</h1><ul>
+<li><strong>可重定位目标文件</strong>。包含二进制代码和数据，其形式可以在编译时与其他可重定位目标文件合并起来，创建一个可执行目标文件。</li>
+<li><strong>可执行目标文件</strong>。包含二进制代码和数据，其形式可以直接被拷贝到内存并执行。</li>
+<li><strong>共享目标文件</strong>。一种特殊类型的可重定位目标文件，可以在加载或运行时，被动态加载到存储器并链接。</li>
+</ul>
+<h2 id="可重定位目标文件">可重定位目标文件</h2><img src="/2015/07/19/链接的基本概念/01.png" alt="[典型的ELF可重定位目标文件]" title="[典型的ELF可重定位目标文件]">
+<ul>
+<li><strong>ELF header</strong>:前16个字节描述了字的大小和生产该文件系统的字节顺序，剩下的包含帮助链接器解析和解释目标文件的信息。</li>
+<li><strong>.text</strong>:已编译程序的机器代码</li>
+<li><strong>.rodata</strong>:只读数据</li>
+<li><strong>.data</strong>:已初始化的全局C变量</li>
+<li><strong>.bss</strong>:未初始化的全局C变量，不占空间</li>
+<li><strong>.symtab</strong>:符号表，存放程序中被定义和引用的函数和全局变量的信息。</li>
+<li><strong>.rel.text</strong>:一个.text节位置列表，保存跟其他文件链接之后需要修改的项</li>
+<li><strong>.rel.data</strong>:记录被模块定义或引用的全局变量的重定位信息</li>
+<li><strong>.debug</strong>:调试符号表</li>
+<li><strong>.line</strong>:源代码行号和.text节中机器码的映射,用于调试.</li>
+<li><strong>.strtab</strong>:一个字符串表包含.symtab和.debug的符号表还有其节头部名.</li>
+</ul>
+<h2 id="可执行目标文件">可执行目标文件</h2><img src="/2015/07/19/链接的基本概念/05.png" alt="[典型的ELF可执行目标文件]" title="[典型的ELF可执行目标文件]">
+<p>从上图可以看出，可执行目标文件被分为三个部分：</p>
+<ul>
+<li><strong>代码段</strong>:只读内存段</li>
+<li><strong>数据段</strong>:可读写内存段</li>
+<li><strong>符号表和调试信息</strong>:这些数据不会在执行时不会被加载到内存中.</li>
+</ul>
+]]></content>
+    <summary type="html">
+    <![CDATA[<h1 id="前言">前言</h1><p>我们知道，开发程序的基本流程是：设计-代码编写-编译-链接-执行</p>
+<p>每一个步骤展开都是一个很大的课题，链接是一个被人忽略的课题，因为它并不是很复杂，相对于编译来说它还是比较简单的，但是并不代表它不重要。<br>现在编译链接的]]>
+    </summary>
+    
+      <category term="链接" scheme="https://github.com/x-hansong/tags/%E9%93%BE%E6%8E%A5/"/>
+    
+      <category term="理解链接" scheme="https://github.com/x-hansong/categories/%E7%90%86%E8%A7%A3%E9%93%BE%E6%8E%A5/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[桌面虚拟化传输协议之android spice]]></title>
+    <link href="https://github.com/x-hansong/2015/07/16/%E6%A1%8C%E9%9D%A2%E8%99%9A%E6%8B%9F%E5%8C%96%E4%BC%A0%E8%BE%93%E5%8D%8F%E8%AE%AE%E4%B9%8Bandroid-spice/"/>
+    <id>https://github.com/x-hansong/2015/07/16/桌面虚拟化传输协议之android-spice/</id>
+    <published>2015-07-16T04:46:15.000Z</published>
+    <updated>2015-07-21T07:43:15.000Z</updated>
+    <content type="html"><![CDATA[<h1 id="背景">背景</h1><p>云计算是目前计算机领域的一个热门领域，桌面虚拟化是其中的一个重要应用，即把桌面系统在服务器端虚拟化，然后通过传输协议传输数据到客户端来实现桌面虚拟化，这样的好处就在于不管用什么设备，只要通过客户端都可以访问到云端的系统，随时随地都可以在一个系统上工作。</p>
+<p>目前有两大标准的桌面传输协议，分别是RBP和RDP。</p>
+<ul>
+<li>RBP有一个简单的架构，即直接把虚拟机的图形数据直接传输给客户端，客户端直接显示图像，有点类似于看网络视频。这样子就对网络的要求较高，高延迟情况下效果很差，但是客户端压力比较小，因此对客户机的性能要求较低，毕竟它只负责显示图像。</li>
+</ul>
+<img src="/2015/07/16/桌面虚拟化传输协议之android-spice/01.png" alt="[RBP]" title="[RBP]">
+<ul>
+<li>RDP稍微复杂一点，使用的是图像局部刷新，它发送事件消息给客户端，提示需要刷新的图像区域并且提供数据，客户端根据消息数据生成图像数据显示出来。因此传输的数据量较少，适合于网络不好情况，但是缺点是客户端需要生成图像数据，对客户机有一定压力。</li>
+</ul>
+<img src="/2015/07/16/桌面虚拟化传输协议之android-spice/02.png" alt="[RDP]" title="[RDP]">
+<p>那么对于移动设备来说，很显然，RDP协议更适合移动设备，因为移动设备在3G，4G情况下不可能用耗费大流量的RFB协议，并且延迟比较高。而RDP协议由于传输的数据量较少，对网络条件要求不高。所以，针对于移动平台来说，RDP协议比较合适。</p>
+<p>但是，由于RDP协议是微软的产品，受限于其证书，并不是开源产品，所以不能用于移动设备。那么，开源的类RDP协议的<a href="http://www.spice-space.org" target="_blank" rel="external">SPICE</a>协议,就隆重登场了，结合我们的主题，在android平台上应用spice协议。下面，我们来介绍spice在android平台上的应用。</p>
+<h1 id="SPICE_协议在android平台的应用">SPICE 协议在android平台的应用</h1><p>Spice事实上并没有android版本，但是它有linux版本，而android是基于linux的，所以，我们可以通过使用NDK来交叉编译Spice库到android上使用。也就是说，我们可以通过使用JNI来调用libspice.so（通过NDK交叉编译），从而在android平台上使用Spice。</p>
+<img src="/2015/07/16/桌面虚拟化传输协议之android-spice/04.png" alt="[android spice]" title="[android spice]">
+<p>Spice服务器通过通道(Channel)来与客户端通信，其中jpeg模块是通过NDK编译好的库，使用JNI调用，把服务器发送过来图像命令转化为图像，再把图像交给android的View显示出来。</p>
+<p>在实际使用中，需要对图像的解析过程进行优化，否则显示的延迟很大。一个解决方案是使用更快的jpeg解析库。</p>
+<p>以上只是对Spice工作原理的简单描述，详细介绍查看官方文档：</p>
+<ul>
+<li><a href="http://www.spice-space.org/docs/spice_for_newbies.pdf" target="_blank" rel="external">spice_for_newbies</a></li>
+<li><a href="http://xhansong.gitbooks.io/spice-guidebook/" target="_blank" rel="external">spice入门</a>(这是我根据spice官方文档翻译的中文版本)</li>
+</ul>
+]]></content>
+    <summary type="html">
+    <![CDATA[<h1 id="背景">背景</h1><p>云计算是目前计算机领域的一个热门领域，桌面虚拟化是其中的一个重要应用，即把桌面系统在服务器端虚拟化，然后通过传输协议传输数据到客户端来实现桌面虚拟化，这样的好处就在于不管用什么设备，只要通过客户端都可以访问到云端的系统，随时随地都可以在]]>
+    </summary>
+    
+      <category term="spice" scheme="https://github.com/x-hansong/tags/spice/"/>
+    
+      <category term="虚拟化" scheme="https://github.com/x-hansong/tags/%E8%99%9A%E6%8B%9F%E5%8C%96/"/>
+    
+      <category term="桌面虚拟化" scheme="https://github.com/x-hansong/categories/%E6%A1%8C%E9%9D%A2%E8%99%9A%E6%8B%9F%E5%8C%96/"/>
+    
+  </entry>
+  
+  <entry>
     <title><![CDATA[算法学习之减治法(decrease and conquer)]]></title>
     <link href="https://github.com/x-hansong/2015/06/22/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E4%B9%8B%E5%87%8F%E6%B2%BB%E6%B3%95-decrease-and-conquer/"/>
     <id>https://github.com/x-hansong/2015/06/22/算法学习之减治法-decrease-and-conquer/</id>
     <published>2015-06-22T02:55:13.000Z</published>
-    <updated>2015-06-22T04:36:50.000Z</updated>
+    <updated>2015-07-16T08:07:01.000Z</updated>
     <content type="html"><![CDATA[<h1 id="什么是分治法">什么是分治法</h1><p>减治技术利用了一个问题给定实例的解和同样问题较小实例的解之间的某种关系。一旦建立了这种关系，就可以从顶至下递归的来用该关系，也可以从底至上非递归的来运用该关系：</p>
 <ol>
 <li>减去一个常量</li>
@@ -43,7 +158,7 @@ S ← <span class="keyword">Set</span> of all nodes with <span class="keyword">n
     <span class="keyword">return</span> <span class="keyword">L</span> (a topologically sortedorder)
 </code></pre><p>不难看出该算法的实现十分直观，关键在于需要维护一个入度为0的顶点的集合：<br>每次从该集合中取出(没有特殊的取出规则，随机取出也行，使用队列/栈也行，下同)一个顶点，将该顶点放入保存结果的List中。<br>紧接着循环遍历由该顶点引出的所有边，从图中移除这条边，同时获取该边的另外一个顶点，如果该顶点的入度在减去本条边之后为0，那么也将这个顶点放到入度为0的集合中。然后继续从集合中取出一个顶点…………</p>
 <p>当集合为空之后，检查图中是否还存在任何边，如果存在的话，说明图中至少存在一条环路。不存在的话则返回结果List，此List中的顺序就是对图进行拓扑排序的结果。</p>
-<img src="/2015/06/22/算法学习之减治法-decrease-and-conquer/00.png" alt="[例子]" title="[例子]">
+
 <p>对上图进行拓扑排序的结果：<br>2-&gt;8-&gt;0-&gt;3-&gt;7-&gt;1-&gt;5-&gt;6-&gt;9-&gt;4-&gt;11-&gt;10-&gt;12</p>
 <p><strong>复杂度分析：</strong><br>初始化入度为0的集合需要遍历整张图，检查每个节点和每条边，因此复杂度为O(E+V);<br>然后对该集合进行操作，又需要遍历整张图中的，每条边，复杂度也为O(E+V);<br>因此Kahn算法的复杂度即为O(E+V)。</p>
 <h5 id="基于DFS的拓扑排序">基于DFS的拓扑排序</h5><pre><code><span class="keyword">L</span> ← Empty <span class="keyword">list</span> that will contain the sorted nodes
@@ -63,10 +178,10 @@ function visit(node <span class="keyword">n</span>)
 <p>实现上的一些不同之处：<br>Kahn算法不需要检测图为DAG，如果图为DAG，那么在出度为0的集合为空之后，图中还存在没有被移除的边，这就说明了图中存在环路。<br>而基于DFS的算法需要首先确定图为DAG，当然也能够做出适当调整，让环路的检测和拓扑排序同时进行，毕竟环路检测也能够在DFS的基础上进行。<br>二者的复杂度均为O(V+E)。</p>
 <h2 id="减去一个常量因子">减去一个常量因子</h2><h3 id="Russian_Peasant_Multiplication">Russian Peasant Multiplication</h3><p>计算两个整数的积</p>
 <h4 id="原理">原理</h4><p>n * m = n/2 * m  n为偶数<br>n * m  = (n-1)/2 * 2m + m  (if n &gt; 1  and m if n = 1) n为奇数</p>
-<h4 id="例子">例子</h4><img src="/2015/06/22/算法学习之减治法-decrease-and-conquer/01.png" alt="[例子]" title="[例子]">
+<h4 id="例子">例子</h4>
 <h2 id="减去的规模是可变的">减去的规模是可变的</h2><h3 id="Selection_Problem">Selection Problem</h3><p>找出数组中第n小的数</p>
 <h4 id="原理-1">原理</h4><p>类似与快速排序,只是把key换做数组的下标,通过数的下标作为分割的依据</p>
-<h4 id="例子-1">例子</h4><img src="/2015/06/22/算法学习之减治法-decrease-and-conquer/02.png" alt="[例子]" title="[例子]">
+<h4 id="例子-1">例子</h4>
 <p><strong>参考资料:</strong><br><a href="http://www.cnblogs.com/kkgreen/archive/2011/06/17/2083915.html" target="_blank" rel="external">减治法（一）</a><br><a href="http://blog.csdn.net/dm_vincent/article/details/7714519" target="_blank" rel="external">拓扑排序的原理及其实现</a></p>
 ]]></content>
     <summary type="html">
@@ -89,7 +204,7 @@ function visit(node <span class="keyword">n</span>)
     <link href="https://github.com/x-hansong/2015/06/18/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E4%B9%8B%E5%88%86%E6%B2%BB%E6%B3%95-divide-and-conquer/"/>
     <id>https://github.com/x-hansong/2015/06/18/算法学习之分治法-divide-and-conquer/</id>
     <published>2015-06-18T10:50:50.000Z</published>
-    <updated>2015-06-19T18:07:31.000Z</updated>
+    <updated>2015-06-19T06:30:04.000Z</updated>
     <content type="html"><![CDATA[<h2 id="什么是分治法">什么是分治法</h2><p>字面上的解释是“分而治之”，就是把一个复杂的问题分成两个或更多的相同或相似的子问题，直到最后子问题可以简单的直接求解，原问题的解即子问题的解的合并。</p>
 <h2 id="解决问题的流程">解决问题的流程</h2><img src="/2015/06/18/算法学习之分治法-divide-and-conquer/00.png" alt="[divide and conquer]" title="[divide and conquer]">
 <h2 id="分治法适用情况">分治法适用情况</h2><pre><code>分治法所能解决的问题一般具有以下几个特征：
@@ -265,7 +380,7 @@ function visit(node <span class="keyword">n</span>)
     <link href="https://github.com/x-hansong/2015/06/17/%E7%94%A8hexo%E6%90%AD%E5%BB%BAgithub%E5%8D%9A%E5%AE%A2/"/>
     <id>https://github.com/x-hansong/2015/06/17/用hexo搭建github博客/</id>
     <published>2015-06-17T02:14:18.000Z</published>
-    <updated>2015-06-19T06:27:32.000Z</updated>
+    <updated>2015-07-19T06:57:42.000Z</updated>
     <content type="html"><![CDATA[<h1 id="背景">背景</h1><p><strong>搭建环境:Linux,nodejs,npm,git</strong></p>
 <p>现在网上已经有很多关于搭建hexo github博客的文章,我自己也是参考别人的文章过来的,但是现在hexo已经到了3.0版本,很多教程都过时了,而且感觉他们教程的思路着重于怎么做,并没有说明背后的原因,所以我希望写一篇着重于<strong>为什么</strong>,而不是怎么做的文章.我相信只有理解背后的原理才能更好更快的上手.</p>
 <p>其次,最好的教程就是官方文档,所以在这篇文章我引用的都是官方文档的内容,而且只是提供思路,不提供详细步骤.因为版本更新之后,操作是不一样的,官方文档会随时更新,但是这篇文章不一定会随时更新,然而思路是不变的,所以我极力推荐大家首先阅读官方文档.</p>
@@ -284,7 +399,8 @@ function visit(node <span class="keyword">n</span>)
 <p>If the first part of the repository doesn’t exactly match your username, it won’t work, so make sure to get it right.</p>
 </blockquote>
 <p>官方教程主要强调命名项目的格式,即一定要命名为 username.github.io<br>同时,建完项目之后不要进行任何操作.我们可以直接用hexo初始化项目.</p>
-<h2 id="安装配置hexo">安装配置hexo</h2><p>这一步强烈推荐看<a href="http://hexo.io/zh-cn/docs/index.html" target="_blank" rel="external">Hexo 官方文档</a>,现在很多网上的安装过程是过时的,现在hexo是3.0了.<br>请耐心的看完官方文档以下内容<br><img src="/2015/06/17/用hexo搭建github博客/00.png" alt="[官方文档目录]" title="[官方文档目录]">_</p>
+<h2 id="安装配置hexo">安装配置hexo</h2><p>这一步强烈推荐看<a href="http://hexo.io/zh-cn/docs/index.html" target="_blank" rel="external">Hexo 官方文档</a>,现在很多网上的安装过程是过时的,现在hexo是3.0了.<br>请耐心的看完官方文档以下内容</p>
+<img src="/2015/06/17/用hexo搭建github博客/00.png" alt="[官方文档目录]" title="[官方文档目录]">
 <p>由于hexo3.0很多功能都插件化了,包括git上传,server功能.<br>所以我们要把博客上传到github就需要先装git插件,详细见<a href="http://hexo.io/zh-cn/docs/deployment.html" target="_blank" rel="external">部署</a>(切记要根据文档配置config.yml)<br>以下是常用插件</p>
 <pre><code>npm <span class="operator"><span class="keyword">install</span> hexo-generator-<span class="keyword">index</span> <span class="comment">--save</span>
 npm <span class="keyword">install</span> hexo-generator-archive <span class="comment">--save</span>

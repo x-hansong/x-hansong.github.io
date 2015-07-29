@@ -31,10 +31,7 @@
 
 分治法例子减去一个常量拓扑排序定义定义：将有向图中的顶点以线性方式进行排序。即对于任何连接自顶点u到顶点v的有向边uv，在最后的排序结果中，顶点u总是在顶点v的前面。
 两">
-<meta property="og:image" content="https://github.com/x-hansong/2015/06/22/算法学习之减治法-decrease-and-conquer/00.png">
-<meta property="og:image" content="https://github.com/x-hansong/2015/06/22/算法学习之减治法-decrease-and-conquer/01.png">
-<meta property="og:image" content="https://github.com/x-hansong/2015/06/22/算法学习之减治法-decrease-and-conquer/02.png">
-<meta property="og:updated_time" content="2015-06-22T04:36:50.000Z">
+<meta property="og:updated_time" content="2015-07-16T08:07:01.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="算法学习之减治法(decrease and conquer)">
 <meta name="twitter:description" content="什么是分治法减治技术利用了一个问题给定实例的解和同样问题较小实例的解之间的某种关系。一旦建立了这种关系，就可以从顶至下递归的来用该关系，也可以从底至上非递归的来运用该关系：
@@ -146,7 +143,7 @@ S ← <span class="keyword">Set</span> of all nodes with <span class="keyword">n
     <span class="keyword">return</span> <span class="keyword">L</span> (a topologically sortedorder)
 </code></pre><p>不难看出该算法的实现十分直观，关键在于需要维护一个入度为0的顶点的集合：<br>每次从该集合中取出(没有特殊的取出规则，随机取出也行，使用队列/栈也行，下同)一个顶点，将该顶点放入保存结果的List中。<br>紧接着循环遍历由该顶点引出的所有边，从图中移除这条边，同时获取该边的另外一个顶点，如果该顶点的入度在减去本条边之后为0，那么也将这个顶点放到入度为0的集合中。然后继续从集合中取出一个顶点…………</p>
 <p>当集合为空之后，检查图中是否还存在任何边，如果存在的话，说明图中至少存在一条环路。不存在的话则返回结果List，此List中的顺序就是对图进行拓扑排序的结果。</p>
-<img src="/2015/06/22/算法学习之减治法-decrease-and-conquer/00.png" alt="[例子]" title="[例子]">
+
 <p>对上图进行拓扑排序的结果：<br>2-&gt;8-&gt;0-&gt;3-&gt;7-&gt;1-&gt;5-&gt;6-&gt;9-&gt;4-&gt;11-&gt;10-&gt;12</p>
 <p><strong>复杂度分析：</strong><br>初始化入度为0的集合需要遍历整张图，检查每个节点和每条边，因此复杂度为O(E+V);<br>然后对该集合进行操作，又需要遍历整张图中的，每条边，复杂度也为O(E+V);<br>因此Kahn算法的复杂度即为O(E+V)。</p>
 <h5 id="基于DFS的拓扑排序">基于DFS的拓扑排序</h5><pre><code><span class="keyword">L</span> ← Empty <span class="keyword">list</span> that will contain the sorted nodes
@@ -166,10 +163,10 @@ function visit(node <span class="keyword">n</span>)
 <p>实现上的一些不同之处：<br>Kahn算法不需要检测图为DAG，如果图为DAG，那么在出度为0的集合为空之后，图中还存在没有被移除的边，这就说明了图中存在环路。<br>而基于DFS的算法需要首先确定图为DAG，当然也能够做出适当调整，让环路的检测和拓扑排序同时进行，毕竟环路检测也能够在DFS的基础上进行。<br>二者的复杂度均为O(V+E)。</p>
 <h2 id="减去一个常量因子">减去一个常量因子</h2><h3 id="Russian_Peasant_Multiplication">Russian Peasant Multiplication</h3><p>计算两个整数的积</p>
 <h4 id="原理">原理</h4><p>n * m = n/2 * m  n为偶数<br>n * m  = (n-1)/2 * 2m + m  (if n &gt; 1  and m if n = 1) n为奇数</p>
-<h4 id="例子">例子</h4><img src="/2015/06/22/算法学习之减治法-decrease-and-conquer/01.png" alt="[例子]" title="[例子]">
+<h4 id="例子">例子</h4>
 <h2 id="减去的规模是可变的">减去的规模是可变的</h2><h3 id="Selection_Problem">Selection Problem</h3><p>找出数组中第n小的数</p>
 <h4 id="原理-1">原理</h4><p>类似与快速排序,只是把key换做数组的下标,通过数的下标作为分割的依据</p>
-<h4 id="例子-1">例子</h4><img src="/2015/06/22/算法学习之减治法-decrease-and-conquer/02.png" alt="[例子]" title="[例子]">
+<h4 id="例子-1">例子</h4>
 <p><strong>参考资料:</strong><br><a href="http://www.cnblogs.com/kkgreen/archive/2011/06/17/2083915.html" target="_blank" rel="external">减治法（一）</a><br><a href="http://blog.csdn.net/dm_vincent/article/details/7714519" target="_blank" rel="external">拓扑排序的原理及其实现</a></p>
   
 	</div>
@@ -206,6 +203,14 @@ function visit(node <span class="keyword">n</span>)
 	
 <nav class="article-nav clearfix">
  
+ <div class="prev" >
+ <a href="/2015/07/16/桌面虚拟化传输协议之android-spice/" title="桌面虚拟化传输协议之android spice">
+  <strong>上一篇：</strong><br/>
+  <span>
+  桌面虚拟化传输协议之android spice</span>
+</a>
+</div>
+
 
 <div class="next">
 <a href="/2015/06/18/算法学习之分治法-divide-and-conquer/"  title="算法学习之分治法(divide and conquer)">
@@ -247,6 +252,14 @@ function visit(node <span class="keyword">n</span>)
 		  
 		
 		  
+			<li><a href="/categories/桌面虚拟化/" title="桌面虚拟化">桌面虚拟化<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/理解链接/" title="理解链接">理解链接<sup>1</sup></a></li>
+		  
+		
+		  
 			<li><a href="/categories/算法学习/" title="算法学习">算法学习<sup>4</sup></a></li>
 		  
 		
@@ -261,6 +274,10 @@ function visit(node <span class="keyword">n</span>)
 		
 			
 				<li><a href="/tags/算法/" title="算法">算法<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/链接/" title="链接">链接<sup>1</sup></a></li>
 			
 		
 			
@@ -281,6 +298,14 @@ function visit(node <span class="keyword">n</span>)
 		
 			
 				<li><a href="/tags/github/" title="github">github<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/虚拟化/" title="虚拟化">虚拟化<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/spice/" title="spice">spice<sup>1</sup></a></li>
 			
 		
 		</ul>

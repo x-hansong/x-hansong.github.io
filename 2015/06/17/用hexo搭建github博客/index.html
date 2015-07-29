@@ -22,7 +22,7 @@
 现在网上已经有很多关于搭建hexo github博客的文章,我自己也是参考别人的文章过来的,但是现在hexo已经到了3.0版本,很多教程都过时了,而且感觉他们教程的思路着重于怎么做,并没有说明背后的原因,所以我希望写一篇着重于为什么,而不是怎么做的文章.我相信只有理解背后的原理才能更好更快的上手.
 其次,最好的教程就是官方文档,所以在这篇文章">
 <meta property="og:image" content="https://github.com/x-hansong/2015/06/17/用hexo搭建github博客/00.png">
-<meta property="og:updated_time" content="2015-06-19T06:27:32.000Z">
+<meta property="og:updated_time" content="2015-07-19T06:57:42.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="用hexo搭建github博客">
 <meta name="twitter:description" content="背景搭建环境:Linux,nodejs,npm,git
@@ -125,7 +125,8 @@
 <p>If the first part of the repository doesn’t exactly match your username, it won’t work, so make sure to get it right.</p>
 </blockquote>
 <p>官方教程主要强调命名项目的格式,即一定要命名为 username.github.io<br>同时,建完项目之后不要进行任何操作.我们可以直接用hexo初始化项目.</p>
-<h2 id="安装配置hexo">安装配置hexo</h2><p>这一步强烈推荐看<a href="http://hexo.io/zh-cn/docs/index.html" target="_blank" rel="external">Hexo 官方文档</a>,现在很多网上的安装过程是过时的,现在hexo是3.0了.<br>请耐心的看完官方文档以下内容<br><img src="/2015/06/17/用hexo搭建github博客/00.png" alt="[官方文档目录]" title="[官方文档目录]">_</p>
+<h2 id="安装配置hexo">安装配置hexo</h2><p>这一步强烈推荐看<a href="http://hexo.io/zh-cn/docs/index.html" target="_blank" rel="external">Hexo 官方文档</a>,现在很多网上的安装过程是过时的,现在hexo是3.0了.<br>请耐心的看完官方文档以下内容</p>
+<img src="/2015/06/17/用hexo搭建github博客/00.png" alt="[官方文档目录]" title="[官方文档目录]">
 <p>由于hexo3.0很多功能都插件化了,包括git上传,server功能.<br>所以我们要把博客上传到github就需要先装git插件,详细见<a href="http://hexo.io/zh-cn/docs/deployment.html" target="_blank" rel="external">部署</a>(切记要根据文档配置config.yml)<br>以下是常用插件</p>
 <pre><code>npm <span class="operator"><span class="keyword">install</span> hexo-generator-<span class="keyword">index</span> <span class="comment">--save</span>
 npm <span class="keyword">install</span> hexo-generator-archive <span class="comment">--save</span>
@@ -257,6 +258,14 @@ npm <span class="keyword">install</span> hexo-generator-sitemap@<span class="num
 		  
 		
 		  
+			<li><a href="/categories/桌面虚拟化/" title="桌面虚拟化">桌面虚拟化<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/理解链接/" title="理解链接">理解链接<sup>1</sup></a></li>
+		  
+		
+		  
 			<li><a href="/categories/算法学习/" title="算法学习">算法学习<sup>4</sup></a></li>
 		  
 		
@@ -271,6 +280,10 @@ npm <span class="keyword">install</span> hexo-generator-sitemap@<span class="num
 		
 			
 				<li><a href="/tags/算法/" title="算法">算法<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/链接/" title="链接">链接<sup>1</sup></a></li>
 			
 		
 			
@@ -291,6 +304,14 @@ npm <span class="keyword">install</span> hexo-generator-sitemap@<span class="num
 		
 			
 				<li><a href="/tags/github/" title="github">github<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/虚拟化/" title="虚拟化">虚拟化<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/spice/" title="spice">spice<sup>1</sup></a></li>
 			
 		
 		</ul>
