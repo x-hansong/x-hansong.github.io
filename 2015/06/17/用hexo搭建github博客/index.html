@@ -2,6 +2,7 @@
  <!DOCTYPE HTML>
 <html lang="zh-CN">
 <head>
+<meta name="baidu-site-verification" content="28u1lswj4v" />
   <meta charset="UTF-8">
   
     <title>用hexo搭建github博客 | ShareHub</title>
@@ -22,7 +23,7 @@
 现在网上已经有很多关于搭建hexo github博客的文章,我自己也是参考别人的文章过来的,但是现在hexo已经到了3.0版本,很多教程都过时了,而且感觉他们教程的思路着重于怎么做,并没有说明背后的原因,所以我希望写一篇着重于为什么,而不是怎么做的文章.我相信只有理解背后的原理才能更好更快的上手.
 其次,最好的教程就是官方文档,所以在这篇文章">
 <meta property="og:image" content="https://github.com/x-hansong/2015/06/17/用hexo搭建github博客/00.png">
-<meta property="og:updated_time" content="2015-07-19T06:57:42.000Z">
+<meta property="og:updated_time" content="2015-08-04T03:30:22.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="用hexo搭建github博客">
 <meta name="twitter:description" content="背景搭建环境:Linux,nodejs,npm,git
@@ -103,7 +104,7 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#背景"><span class="toc-number">1.</span> <span class="toc-text">背景</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#什么是Github_Page"><span class="toc-number">1.1.</span> <span class="toc-text">什么是Github Page</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#什么是Hexo"><span class="toc-number">1.2.</span> <span class="toc-text">什么是Hexo</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#操作"><span class="toc-number">2.</span> <span class="toc-text">操作</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#建立一个Github_page"><span class="toc-number">2.1.</span> <span class="toc-text">建立一个Github page</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Create_a_repository"><span class="toc-number">2.2.</span> <span class="toc-text">Create a repository</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装配置hexo"><span class="toc-number">2.3.</span> <span class="toc-text">安装配置hexo</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#用hexo写作github博客的流程"><span class="toc-number">2.4.</span> <span class="toc-text">用hexo写作github博客的流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#hexo与github的关系"><span class="toc-number">2.5.</span> <span class="toc-text">hexo与github的关系</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#hexo的主题"><span class="toc-number">2.6.</span> <span class="toc-text">hexo的主题</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#总结"><span class="toc-number">3.</span> <span class="toc-text">总结</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#背景"><span class="toc-number">1.</span> <span class="toc-text">背景</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#什么是Github_Page"><span class="toc-number">1.1.</span> <span class="toc-text">什么是Github Page</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#什么是Hexo"><span class="toc-number">1.2.</span> <span class="toc-text">什么是Hexo</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#操作"><span class="toc-number">2.</span> <span class="toc-text">操作</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#建立一个Github_page"><span class="toc-number">2.1.</span> <span class="toc-text">建立一个Github page</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Create_a_repository"><span class="toc-number">2.2.</span> <span class="toc-text">Create a repository</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装配置hexo"><span class="toc-number">2.3.</span> <span class="toc-text">安装配置hexo</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#用hexo写作github博客的流程"><span class="toc-number">2.4.</span> <span class="toc-text">用hexo写作github博客的流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#hexo与github的关系"><span class="toc-number">2.5.</span> <span class="toc-text">hexo与github的关系</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#hexo的主题"><span class="toc-number">2.6.</span> <span class="toc-text">hexo的主题</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#总结"><span class="toc-number">3.</span> <span class="toc-text">总结</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#补充"><span class="toc-number">4.</span> <span class="toc-text">补充</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#关于草稿的使用方法"><span class="toc-number">4.1.</span> <span class="toc-text">关于草稿的使用方法</span></a></li></ol></li></ol>
 		
 		</div>
 		
@@ -179,9 +180,15 @@ npm <span class="keyword">install</span> hexo-generator-sitemap@<span class="num
 <p>总的来说,刚开始配置就是一直在折腾,需要有足够的耐心,可能大家都喜欢看别人一步步的详细的步骤,自己只要复制粘贴就行了.但是有时候即使你完全照着做也会出问题的,因为版本和环境不一样.</p>
 <p>一开始我也是这样,后来才发现,最好的方法是查看别人做的思路,然后去找官方的文档.这样遇到的问题会大大减少,有时候你纠结半天的问题可能只是版本不一样.就像前面deploy部署,所有文章都是没有提到要先装</p>
 <pre><code>npm <span class="operator"><span class="keyword">install</span> hexo-deployer-git <span class="comment">--save</span></span>
-</code></pre><p>因为hexo3.0把它插件化了,然后我在官方文档找到了答案.<br><strong>最后提示一下：如果运行命令出现什么问题，加上sudo试试看看，里面有些需要root权限</strong></p>
+</code></pre><p>因为hexo3.0把它插件化了,然后我在官方文档找到了答案.<br><strong>最后提示一下：如果运行命令出现什么问题，加上sudo试试看看，里面有些需要root权限(例如说<code>sudo hexo server</code>)</strong></p>
 <p>仅以此文记录折腾hexo的过程,并且希望给后来者有参考价值.</p>
 <p>最后推荐一篇极其详细的使用hexo的文章<a href="http://ibruce.info/2013/11/22/hexo-your-blog/" target="_blank" rel="external">hexo你的博客</a><br><em>里面的搭建流程是hexo2.0的,最好参考官方文档3.0的方法</em></p>
+<h1 id="补充">补充</h1><h2 id="关于草稿的使用方法">关于草稿的使用方法</h2><p>官方文档关于草稿的使用没有说的很清楚,我根据自己的使用情况作一些介绍.</p>
+<ul>
+<li>创建草稿<br>  <code>hexo new draft &quot;title&quot;</code><br>  在source/_drafts中会创建一份md文件.作为草稿.</li>
+<li>预览草稿<br>  这一步文档中只是要加<code>--draft</code>,没有详细说在哪里加这个选项.根据我的实验,需要在两个命令中添加<code>--draft</code><br>  <code>hexo generate --draft</code>在生成时同时生成草稿<br>  <code>hexo server --draft</code>在本地预览时显示草稿</li>
+<li>发布草稿<br>  <code>hexo publish draft &quot;title&quot;</code>把草稿从_draft中移动到_post</li>
+</ul>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -240,7 +247,7 @@ npm <span class="keyword">install</span> hexo-generator-sitemap@<span class="num
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#背景"><span class="toc-number">1.</span> <span class="toc-text">背景</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#什么是Github_Page"><span class="toc-number">1.1.</span> <span class="toc-text">什么是Github Page</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#什么是Hexo"><span class="toc-number">1.2.</span> <span class="toc-text">什么是Hexo</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#操作"><span class="toc-number">2.</span> <span class="toc-text">操作</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#建立一个Github_page"><span class="toc-number">2.1.</span> <span class="toc-text">建立一个Github page</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Create_a_repository"><span class="toc-number">2.2.</span> <span class="toc-text">Create a repository</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装配置hexo"><span class="toc-number">2.3.</span> <span class="toc-text">安装配置hexo</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#用hexo写作github博客的流程"><span class="toc-number">2.4.</span> <span class="toc-text">用hexo写作github博客的流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#hexo与github的关系"><span class="toc-number">2.5.</span> <span class="toc-text">hexo与github的关系</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#hexo的主题"><span class="toc-number">2.6.</span> <span class="toc-text">hexo的主题</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#总结"><span class="toc-number">3.</span> <span class="toc-text">总结</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#背景"><span class="toc-number">1.</span> <span class="toc-text">背景</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#什么是Github_Page"><span class="toc-number">1.1.</span> <span class="toc-text">什么是Github Page</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#什么是Hexo"><span class="toc-number">1.2.</span> <span class="toc-text">什么是Hexo</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#操作"><span class="toc-number">2.</span> <span class="toc-text">操作</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#建立一个Github_page"><span class="toc-number">2.1.</span> <span class="toc-text">建立一个Github page</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Create_a_repository"><span class="toc-number">2.2.</span> <span class="toc-text">Create a repository</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装配置hexo"><span class="toc-number">2.3.</span> <span class="toc-text">安装配置hexo</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#用hexo写作github博客的流程"><span class="toc-number">2.4.</span> <span class="toc-text">用hexo写作github博客的流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#hexo与github的关系"><span class="toc-number">2.5.</span> <span class="toc-text">hexo与github的关系</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#hexo的主题"><span class="toc-number">2.6.</span> <span class="toc-text">hexo的主题</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#总结"><span class="toc-number">3.</span> <span class="toc-text">总结</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#补充"><span class="toc-number">4.</span> <span class="toc-text">补充</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#关于草稿的使用方法"><span class="toc-number">4.1.</span> <span class="toc-text">关于草稿的使用方法</span></a></li></ol></li></ol>
  
   </div>
 
@@ -255,6 +262,8 @@ npm <span class="keyword">install</span> hexo-generator-sitemap@<span class="num
 		
 		  
 			<li><a href="/categories/Hexo/" title="Hexo">Hexo<sup>1</sup></a></li>
+		  
+		
 		  
 		
 		  
@@ -283,6 +292,10 @@ npm <span class="keyword">install</span> hexo-generator-sitemap@<span class="num
 			
 		
 			
+				<li><a href="/tags/spice/" title="spice">spice<sup>1</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/链接/" title="链接">链接<sup>1</sup></a></li>
 			
 		
@@ -308,10 +321,6 @@ npm <span class="keyword">install</span> hexo-generator-sitemap@<span class="num
 		
 			
 				<li><a href="/tags/虚拟化/" title="虚拟化">虚拟化<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/spice/" title="spice">spice<sup>1</sup></a></li>
 			
 		
 		</ul>

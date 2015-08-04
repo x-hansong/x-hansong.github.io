@@ -380,7 +380,7 @@ function visit(node <span class="keyword">n</span>)
     <link href="https://github.com/x-hansong/2015/06/17/%E7%94%A8hexo%E6%90%AD%E5%BB%BAgithub%E5%8D%9A%E5%AE%A2/"/>
     <id>https://github.com/x-hansong/2015/06/17/用hexo搭建github博客/</id>
     <published>2015-06-17T02:14:18.000Z</published>
-    <updated>2015-07-19T06:57:42.000Z</updated>
+    <updated>2015-08-04T03:30:22.000Z</updated>
     <content type="html"><![CDATA[<h1 id="背景">背景</h1><p><strong>搭建环境:Linux,nodejs,npm,git</strong></p>
 <p>现在网上已经有很多关于搭建hexo github博客的文章,我自己也是参考别人的文章过来的,但是现在hexo已经到了3.0版本,很多教程都过时了,而且感觉他们教程的思路着重于怎么做,并没有说明背后的原因,所以我希望写一篇着重于<strong>为什么</strong>,而不是怎么做的文章.我相信只有理解背后的原理才能更好更快的上手.</p>
 <p>其次,最好的教程就是官方文档,所以在这篇文章我引用的都是官方文档的内容,而且只是提供思路,不提供详细步骤.因为版本更新之后,操作是不一样的,官方文档会随时更新,但是这篇文章不一定会随时更新,然而思路是不变的,所以我极力推荐大家首先阅读官方文档.</p>
@@ -453,9 +453,15 @@ npm <span class="keyword">install</span> hexo-generator-sitemap@<span class="num
 <p>总的来说,刚开始配置就是一直在折腾,需要有足够的耐心,可能大家都喜欢看别人一步步的详细的步骤,自己只要复制粘贴就行了.但是有时候即使你完全照着做也会出问题的,因为版本和环境不一样.</p>
 <p>一开始我也是这样,后来才发现,最好的方法是查看别人做的思路,然后去找官方的文档.这样遇到的问题会大大减少,有时候你纠结半天的问题可能只是版本不一样.就像前面deploy部署,所有文章都是没有提到要先装</p>
 <pre><code>npm <span class="operator"><span class="keyword">install</span> hexo-deployer-git <span class="comment">--save</span></span>
-</code></pre><p>因为hexo3.0把它插件化了,然后我在官方文档找到了答案.<br><strong>最后提示一下：如果运行命令出现什么问题，加上sudo试试看看，里面有些需要root权限</strong></p>
+</code></pre><p>因为hexo3.0把它插件化了,然后我在官方文档找到了答案.<br><strong>最后提示一下：如果运行命令出现什么问题，加上sudo试试看看，里面有些需要root权限(例如说<code>sudo hexo server</code>)</strong></p>
 <p>仅以此文记录折腾hexo的过程,并且希望给后来者有参考价值.</p>
 <p>最后推荐一篇极其详细的使用hexo的文章<a href="http://ibruce.info/2013/11/22/hexo-your-blog/" target="_blank" rel="external">hexo你的博客</a><br><em>里面的搭建流程是hexo2.0的,最好参考官方文档3.0的方法</em></p>
+<h1 id="补充">补充</h1><h2 id="关于草稿的使用方法">关于草稿的使用方法</h2><p>官方文档关于草稿的使用没有说的很清楚,我根据自己的使用情况作一些介绍.</p>
+<ul>
+<li>创建草稿<br>  <code>hexo new draft &quot;title&quot;</code><br>  在source/_drafts中会创建一份md文件.作为草稿.</li>
+<li>预览草稿<br>  这一步文档中只是要加<code>--draft</code>,没有详细说在哪里加这个选项.根据我的实验,需要在两个命令中添加<code>--draft</code><br>  <code>hexo generate --draft</code>在生成时同时生成草稿<br>  <code>hexo server --draft</code>在本地预览时显示草稿</li>
+<li>发布草稿<br>  <code>hexo publish draft &quot;title&quot;</code>把草稿从_draft中移动到_post</li>
+</ul>
 ]]></content>
     <summary type="html">
     <![CDATA[<h1 id="背景">背景</h1><p><strong>搭建环境:Linux,nodejs,npm,git</strong></p>
