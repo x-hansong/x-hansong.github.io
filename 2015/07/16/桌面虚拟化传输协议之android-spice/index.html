@@ -28,7 +28,7 @@ RBP有一个简单的架构，即直接把虚拟机的图形数据直接传输�
 <meta property="og:image" content="https://github.com/x-hansong/2015/07/16/桌面虚拟化传输协议之android-spice/01.png">
 <meta property="og:image" content="https://github.com/x-hansong/2015/07/16/桌面虚拟化传输协议之android-spice/02.png">
 <meta property="og:image" content="https://github.com/x-hansong/2015/07/16/桌面虚拟化传输协议之android-spice/04.png">
-<meta property="og:updated_time" content="2015-07-21T07:43:15.000Z">
+<meta property="og:updated_time" content="2015-08-20T07:18:10.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="桌面虚拟化传输协议之android spice">
 <meta name="twitter:description" content="背景云计算是目前计算机领域的一个热门领域，桌面虚拟化是其中的一个重要应用，即把桌面系统在服务器端虚拟化，然后通过传输协议传输数据到客户端来实现桌面虚拟化，这样的好处就在于不管用什么设备，只要通过客户端都可以访问到云端的系统，随时随地都可以在一个系统上工作。
@@ -130,6 +130,7 @@ RBP有一个简单的架构，即直接把虚拟机的图形数据直接传输�
 <img src="/2015/07/16/桌面虚拟化传输协议之android-spice/04.png" alt="[android spice]" title="[android spice]">
 <p>Spice服务器通过通道(Channel)来与客户端通信，其中jpeg模块是通过NDK编译好的库，使用JNI调用，把服务器发送过来图像命令转化为图像，再把图像交给android的View显示出来。</p>
 <p>在实际使用中，需要对图像的解析过程进行优化，否则显示的延迟很大。一个解决方案是使用更快的jpeg解析库。</p>
+<p>最后,推荐一个开源的spice安卓客户端<a href="https://github.com/iiordanov/remote-desktop-clients">remote-desktop-clients</a></p>
 <p>以上只是对Spice工作原理的简单描述，详细介绍查看官方文档：</p>
 <ul>
 <li><a href="http://www.spice-space.org/docs/spice_for_newbies.pdf" target="_blank" rel="external">spice_for_newbies</a></li>
@@ -142,7 +143,7 @@ RBP有一个简单的架构，即直接把虚拟机的图形数据直接传输�
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/桌面虚拟化/">桌面虚拟化</a>
+  <a class="article-category-link" href="/categories/虚拟化/">虚拟化</a>
 </div>
 
 
@@ -219,9 +220,7 @@ RBP有一个简单的架构，即直接把虚拟机的图形数据直接传输�
 		  
 		
 		  
-		
-		  
-			<li><a href="/categories/桌面虚拟化/" title="桌面虚拟化">桌面虚拟化<sup>1</sup></a></li>
+			<li><a href="/categories/spice源码分析/" title="spice源码分析">spice源码分析<sup>1</sup></a></li>
 		  
 		
 		  
@@ -230,6 +229,10 @@ RBP有一个简单的架构，即直接把虚拟机的图形数据直接传输�
 		
 		  
 			<li><a href="/categories/算法学习/" title="算法学习">算法学习<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/虚拟化/" title="虚拟化">虚拟化<sup>2</sup></a></li>
 		  
 		
 		</ul>
@@ -246,7 +249,7 @@ RBP有一个简单的架构，即直接把虚拟机的图形数据直接传输�
 			
 		
 			
-				<li><a href="/tags/spice/" title="spice">spice<sup>1</sup></a></li>
+				<li><a href="/tags/spice/" title="spice">spice<sup>3</sup></a></li>
 			
 		
 			

@@ -1,144 +1,120 @@
-<?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom">
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+<meta name="google-site-verification" content="6wlbKgFEjRhJyXF4xjxEpA_IpuycvAMznqNQvAZ0OCY" />
+<meta name="baidu-site-verification" content="28u1lswj4v" />
+  <meta charset="UTF-8">
   
-  <title><![CDATA[ShareHub]]></title>
-  <subtitle><![CDATA[悲观的意志,乐观的头脑]]></subtitle>
-  <link href="/atom.xml" rel="self"/>
-  <link href="https://github.com/x-hansong//"/>
-  <updated>2015-08-20T07:39:53.000Z</updated>
-  <id>https://github.com/x-hansong//</id>
-  
-  <author>
-    <name><![CDATA[Yonah-潇]]></name>
+    <title>spice源码分析之server | ShareHub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
-  </author>
-  
-  <generator uri="http://hexo.io/">Hexo</generator>
-  
-  <entry>
-    <title><![CDATA[spice源码分析之server(1)]]></title>
-    <link href="https://github.com/x-hansong/2015/08/19/spice%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B9%8Bserver-1/"/>
-    <id>https://github.com/x-hansong/2015/08/19/spice源码分析之server-1/</id>
-    <published>2015-08-19T07:36:41.000Z</published>
-    <updated>2015-08-20T07:39:53.000Z</updated>
-    <content type="html"><![CDATA[<p><em>前言:本文是结合我自己阅读代码的心得总结而来,同时会忽略很多细节,只能作为阅读源码时的参考.如有错误,欢迎指正.</em></p>
-<h1 id="Spice简介">Spice简介</h1><blockquote>
-<p>Spice是一个开源的云计算解决方案，使客户端能显示远程虚拟主机的操作界面并且使用其设备，如键盘，鼠标，声音等。Spice给用户提供了一种如同操作本地机器一样的体验，同时尽可能把密集的CPU和GPU任务在客户端上执行。Spice能在局域网和互联网间使用，而不减少用户体验。<br><img src="/2015/08/19/spice源码分析之server-1/01.png" alt="[图0]" title="[图0]"></p>
-</blockquote>
-<p>Spice的基本组成包括:</p>
-<ul>
-<li>Spice协议</li>
-<li>Spice服务器</li>
-<li>Spice客户端</li>
-</ul>
-<p>Spice的相关组件包括:</p>
-<ul>
-<li>QXL设备</li>
-<li>QXL驱动</li>
-</ul>
-<p>其中,Spice服务器基于libspice（一个虚拟设备接口可插拔库）。VDI提供了一个通过软件组件来发布虚拟设备接口的标准方式，使得软件组件能够与虚拟设备交互。</p>
-<ul>
-<li>服务器使用Spice协议与客户端交互。</li>
-<li>服务器通过VDI接口与VDI主机程序（如QEMU）交互。</li>
-</ul>
-<p>也就是说spice服务器处于主机与客户端中间,是整个Spice的核心所在.下面我们开始从代码层面分析spice服务器<br>更多资料查看本人翻译的spice新手文档<a href="https://www.gitbook.com/book/xhansong/spice-guidebook" target="_blank" rel="external">Spice入门</a>,以及<a href="http://www.spice-space.org/" target="_blank" rel="external">官方网站</a></p>
-<h1 id="Spice_server">Spice server</h1><img src="/2015/08/19/spice源码分析之server-1/00.png" alt="[图1]" title="[图1]">
-<p>图1是spice服务器的核心架构,贯穿整个源码的组织结构.<br>值得一提的是,spice server是作为一个库提供给qemu使用的,编译出来就是libspice,所以代码中没有main函数.<br>下面我们先了解一个server源码中使用到的一些核心概念,在看源码之前推荐大家先看一遍<a href="https://www.gitbook.com/book/xhansong/spice-guidebook" target="_blank" rel="external">Spice入门</a>,否则理解代码中的某些核心概念会很吃力.</p>
-<h2 id="部分宏定义">部分宏定义</h2><ul>
-<li><strong>SPICE_GNUC_DEPRECATED</strong>,其定义是<code>#define SPICE_GNUC_DEPRECATED  __attribute__((__deprecated__))</code>表示该函数以及被弃用,在编译时会给出警告</li>
-<li><strong>SPICE_GNUC_VISIBLE</strong>,其定义是<code>#define SPICE_GNUC_VISIBLE __attribute__ ((visibility (&quot;default&quot;)))</code>用于控制符号的可见性,设置为对外可见.spice作为动态链接库给qemu使用,默认隐藏函数对外部的可见性,即外部文件不能调用库里面的函数,有这个声明的函数可以被外部文件调用,即为公共函数.</li>
-</ul>
-<h2 id="公共函数">公共函数</h2><p>Server的公共函数主要在两个头文件中:</p>
-<ul>
-<li><strong>spice.h</strong>:与SpiceServer结构体相关的函数,是qemu调用spice的主要函数</li>
-<li><strong>red_dispatcher.h</strong>:与QXL设备相关的函数</li>
-</ul>
-<p>对server的分析,主要围绕这三个公共函数:</p>
-<ul>
-<li><strong>spice_server_init</strong>:负责初始化spice_server</li>
-<li><strong>spice_server_add_interface</strong>:给server注册VDI接口</li>
-<li><strong>spice_server_add_client</strong>:处理qemu接收到的客户端连接消息</li>
-</ul>
-<h2 id="VDI接口">VDI接口</h2><p>从图1中可以看到,VDI接口是spice server离qemu最近的一层,qemu主要是通过VDI接口来与spice交互的.<br>VDI接口的定义在spice.h中,结构体内部的函数指针实现都在qemu的源码里面(ui/spice-core.c)</p>
-<ul>
-<li><p><strong>SpiceCoreInterface</strong>:核心接口,用于创建,添加,取消定时和监听事件</p>
-<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">SpiceTimer *<span class="list">(<span class="keyword">*timer_add</span>)</span><span class="list">(<span class="keyword">SpiceTimerFunc</span> func, void <span class="variable">*opaque);</span><br><span class="line">void (*</span>timer_start)</span><span class="list">(<span class="keyword">SpiceTimer</span> <span class="variable">*timer, uint32_t ms);</span><br><span class="line">void (*</span>timer_cancel)</span><span class="list">(<span class="keyword">SpiceTimer</span> <span class="variable">*timer);</span><br><span class="line">void (*</span>timer_remove)</span><span class="list">(<span class="keyword">SpiceTimer</span> <span class="variable">*timer);</span><br><span class="line">SpiceWatch *</span><span class="list">(<span class="keyword">*watch_add</span>)</span><span class="list">(<span class="keyword">int</span> fd, int event_mask, SpiceWatchFunc func, void <span class="variable">*opaque);</span><br><span class="line">void (*</span>watch_update_mask)</span><span class="list">(<span class="keyword">SpiceWatch</span> <span class="variable">*watch, int event_mask);</span><br><span class="line">void (*</span>watch_remove)</span><span class="list">(<span class="keyword">SpiceWatch</span> <span class="variable">*watch);</span><br><span class="line">void (*</span>channel_event)</span><span class="list">(<span class="keyword">int</span> event, SpiceChannelEventInfo <span class="variable">*info);</span></span></span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>QXLInterface</strong>:QXL设备接口</p>
-<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">void <span class="list">(<span class="keyword">*attache_worker</span>)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin, QXLWorker *</span>qxl_worker)</span><span class="comment">;</span></span><br><span class="line">void <span class="list">(<span class="keyword">*set_compression_level</span>)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin, int level);</span><br><span class="line">void (*</span>set_mm_time)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin, uint32_t mm_time);</span><br><span class="line">void (*</span>get_init_info)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin, QXLDevInitInfo *</span>info)</span><span class="comment">;</span></span><br><span class="line">int <span class="list">(<span class="keyword">*get_command</span>)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin, struct QXLCommandExt *</span>cmd)</span><span class="comment">;</span></span><br><span class="line">int <span class="list">(<span class="keyword">*req_cmd_notification</span>)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin);</span><br><span class="line">void (*</span>release_resource)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin, struct QXLReleaseInfoExt release_info);</span><br><span class="line">int (*</span>get_cursor_command)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin, struct QXLCommandExt *</span>cmd)</span><span class="comment">;</span></span><br><span class="line">int <span class="list">(<span class="keyword">*req_cursor_notification</span>)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin);</span><br><span class="line">void (*</span>notify_update)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin, uint32_t update_id);</span><br><span class="line">int (*</span>flush_resources)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin);</span><br><span class="line">void (*</span>async_complete)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin, uint64_t cookie);</span><br><span class="line">void (*</span>update_area_complete)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin, uint32_t surface_id,struct QXLRect *</span>updated_rects,uint32_t num_updated_rects)</span><span class="comment">;</span></span><br><span class="line">void <span class="list">(<span class="keyword">*set_client_capabilities</span>)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin,uint8_t client_present,uint8_t caps[58]);</span><br><span class="line">/*</span> returns <span class="number">1</span> if the interface is supported, <span class="number">0</span> otherwise.</span><br><span class="line"> <span class="variable">* if monitors_config is NULL nothing is done except reporting the</span><br><span class="line"> *</span> return code. <span class="variable">*/</span><br><span class="line">int (*</span>client_monitors_config)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin,VDAgentMonitorsConfig *</span>monitors_config)</span><span class="comment">;</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>SpiceCharDeviceInterface</strong>:字符型设备接口</p>
-<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">void <span class="list">(<span class="keyword">*state</span>)</span><span class="list">(<span class="keyword">SpiceCharDeviceInstance</span> <span class="variable">*sin, int connected);</span><br><span class="line">int (*</span>write)</span><span class="list">(<span class="keyword">SpiceCharDeviceInstance</span> <span class="variable">*sin, const uint8_t *</span>buf, int len)</span><span class="comment">;</span></span><br><span class="line">int <span class="list">(<span class="keyword">*read</span>)</span><span class="list">(<span class="keyword">SpiceCharDeviceInstance</span> <span class="variable">*sin, uint8_t *</span>buf, int len)</span><span class="comment">;</span></span><br><span class="line">void <span class="list">(<span class="keyword">*event</span>)</span><span class="list">(<span class="keyword">SpiceCharDeviceInstance</span> <span class="variable">*sin, uint8_t event);</span></span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>SpiceKbdInterface</strong>:键盘接口</p>
-<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">void <span class="list">(<span class="keyword">*push_scan_freg</span>)</span><span class="list">(<span class="keyword">SpiceKbdInstance</span> <span class="variable">*sin, uint8_t frag);</span><br><span class="line">uint8_t (*</span>get_leds)</span><span class="list">(<span class="keyword">SpiceKbdInstance</span> <span class="variable">*sin);</span></span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>SpiceMigrateInterface</strong>:迁移接口</p>
-<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">void <span class="list">(<span class="keyword">*migrate_connect_complete</span>)</span><span class="list">(<span class="keyword">SpiceMigrateInstance</span> <span class="variable">*sin);</span><br><span class="line">void (*</span>migrate_end_complete)</span><span class="list">(<span class="keyword">SpiceMigrateInstance</span> <span class="variable">*sin);</span></span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>SpiceMouseInterface</strong>:鼠标接口</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> (*motion)(SpiceMouseInstance *<span class="built_in">sin</span>, <span class="keyword">int</span> dx, <span class="keyword">int</span> dy, <span class="keyword">int</span> dz,<span class="keyword">uint32_t</span> buttons_state);</span><br><span class="line"><span class="keyword">void</span> (*buttons)(SpiceMouseInstance *<span class="built_in">sin</span>, <span class="keyword">uint32_t</span> buttons_state);</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>SpiceTabletInterface</strong>:触摸板接口</p>
-<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">void <span class="list">(<span class="keyword">*set_logical_size</span>)</span><span class="list">(<span class="keyword">SpiceTabletInstance*</span> tablet, int width, int height)</span><span class="comment">;</span></span><br><span class="line">void <span class="list">(<span class="keyword">*position</span>)</span><span class="list">(<span class="keyword">SpiceTabletInstance*</span> tablet, int x, int y, uint32_t buttons_state)</span><span class="comment">;</span></span><br><span class="line">void <span class="list">(<span class="keyword">*wheel</span>)</span><span class="list">(<span class="keyword">SpiceTabletInstance*</span> tablet, int wheel_moution, uint32_t buttons_state)</span><span class="comment">;</span></span><br><span class="line">void <span class="list">(<span class="keyword">*buttons</span>)</span><span class="list">(<span class="keyword">SpiceTabletInstance*</span> tablet, uint32_t buttons_state)</span><span class="comment">;</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>SpicePlaybackInterface</strong>:声音接口</p>
-</li>
-<li><strong>SpiceRecordInterface</strong>:录音接口</li>
-</ul>
-<h2 id="Channel">Channel</h2><p>从图1可以看到,VDI接口之后即是Channel(QXLInterface比较特殊,这个后面再说).<br>Channel的主要作用是使用对应的TCP连接传输消息给客户端,保证其传输的可靠性,其本质是通道,不同的Channel传输不同的消息.</p>
-<p>spice中主要有六种Channel:</p>
-<ul>
-<li><strong>MainChannel</strong>:与客户端连接的建立和断开有关</li>
-<li><strong>InputsChannel</strong>:跟鼠标,键盘,触摸板的输入有关</li>
-<li><strong>DisplayChannel</strong>:跟图像传输有关</li>
-<li><strong>CursorChannel</strong>:跟鼠标指针的显示有关</li>
-<li><strong>PlaybackChannel</strong>:跟播放宿机的声音有关</li>
-<li><strong>RecordChannel</strong>:跟录制客户端的声音有关</li>
-</ul>
-<p>这六种Channel并不是平行的关系,虽然都继承与RedChannel,但是在实现以及逻辑上的作用有很大不同,大致可以分成三类.</p>
-<ul>
-<li>Main和Input通道被相应的处理函数控制(reds.c)</li>
-<li>Display和Cursor通道被每个display工作线程使用(red_worker.c)</li>
-<li>Playback和Record通道有它们各自的处理程序(snd_worker.c)</li>
-</ul>
-<p>六种Channel中只有DisplayChannel和CursorChannel是单独在工作线程工作的,其他都是在qemu线程工作.</p>
-<h2 id="Dispatcher">Dispatcher</h2><img src="/2015/08/19/spice源码分析之server-1/02.png" alt="[图3]" title="[图3]">
-<p>前面提到Channel负责传输消息,而Dispatcher则负责处理消息,并且调度Channel.<br>Dispatcher使用socketpair来与外界交互,例如监听事件,传输结果等.<br>这里存在两种Dispatcher</p>
-<ul>
-<li><strong>MainDispatcher</strong>:在qemu线程中监听socket事件,处理客户端连接的初始化,建立和断开等,跟MainChannel相关</li>
-<li><strong>RedDispatcher</strong>:在worker线程中监听socket事件,处理QXL设备有关的消息,跟DisplayChannel,CursorChannel相关,图3描述的就是RedDispatcher的工作流程.在图1我们看到QXLInterface与其他接口不一样,与Channel的联系中间多了一个RedDispatcher,它们在单独的Worker线程中工作,提供了QEMU与接收的图像命令处理和渲染过程的独立性</li>
-</ul>
-<h2 id="RedWorker">RedWorker</h2><p>RedWorker可以说是server的核心,80%代码跟它有关,毕竟它负责图像渲染和传输,这是spice最难最复杂的部分,涉及图像的压缩,渲染,局部刷新等核心技术.<br>RedWorker在单独线程上工作,通过QXLInterface与QEMU的QXL设备直接交互,同时控制DisplayChannel,CursorChannel,并且拥有自己的poll事件驱动核心.而其他的Channel都依赖于QEMU线程.</p>
-<h1 id="总结">总结</h1><ul>
-<li>Spice server作为一个库给QEMU调用,用于支持Spice协议.</li>
-<li>server通过使用VDI接口与QEMU交互</li>
-<li>server通过使用Channel与客户端交互</li>
-<li>Dispatcher用于处理消息</li>
-<li>Channel用于传输消息</li>
-<li>图像在RedWorker线程中处理</li>
-</ul>
-<p>以上是我分析的server源代码的核心概念,为了方便理解,描述并不全面.其中关于迁移,声音,录音等功能并没有看过,我主要关注server的工作原理,在了解它工作流程之后,就好比有了一张地图,剩下的就是一个个去探险了.<br>当然了,没有代码的分析就是耍流氓.这篇就当是开胃菜,之后,我会结合代码,分析server的启动流程以及工作流程.先挖个坑.</p>
-]]></content>
-    <summary type="html">
-    <![CDATA[<p><em>前言:本文是结合我自己阅读代码的心得总结而来,同时会忽略很多细节,只能作为阅读源码时的参考.如有错误,欢迎指正.</em></p>
-<h1 id="Spice简介">Spice简介</h1><blockquote>
-<p>Spice是一个开源的云计算解决方案，使客户]]>
-    </summary>
+    <meta name="author" content="Yonah-潇">
     
-      <category term="spice" scheme="https://github.com/x-hansong/tags/spice/"/>
+
     
-      <category term="虚拟化" scheme="https://github.com/x-hansong/categories/%E8%99%9A%E6%8B%9F%E5%8C%96/"/>
+    <meta name="description" content="注:下面的分析省略了所有关于迁移功能的函数与变量.只注重分析关键性函数和变量.
+spice.h公开的函数接口部分宏定义
+
+SPICE_GNUC_DEPRECATED,其定义是#define SPICE_GNUC_DEPRECATED  __attribute__((__deprecated__))表示该函数以及被弃用,在编译时会给出警告
+SPICE_GNUC_VISIBLE,其定义是#define">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spice源码分析之server">
+<meta property="og:url" content="https://github.com/x-hansong/2015/07/29/spice源码分析之server/index.html">
+<meta property="og:site_name" content="ShareHub">
+<meta property="og:description" content="注:下面的分析省略了所有关于迁移功能的函数与变量.只注重分析关键性函数和变量.
+spice.h公开的函数接口部分宏定义
+
+SPICE_GNUC_DEPRECATED,其定义是#define SPICE_GNUC_DEPRECATED  __attribute__((__deprecated__))表示该函数以及被弃用,在编译时会给出警告
+SPICE_GNUC_VISIBLE,其定义是#define">
+<meta property="og:updated_time" content="2015-08-19T07:25:20.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="spice源码分析之server">
+<meta name="twitter:description" content="注:下面的分析省略了所有关于迁移功能的函数与变量.只注重分析关键性函数和变量.
+spice.h公开的函数接口部分宏定义
+
+SPICE_GNUC_DEPRECATED,其定义是#define SPICE_GNUC_DEPRECATED  __attribute__((__deprecated__))表示该函数以及被弃用,在编译时会给出警告
+SPICE_GNUC_VISIBLE,其定义是#define">
+
     
-  </entry>
+    <link rel="alternative" href="/atom.xml" title="ShareHub" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="ShareHub" title="ShareHub"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="ShareHub">ShareHub</a></h1>
+				<h2 class="blog-motto">悲观的意志,乐观的头脑</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">主页|Home</a></li>
+					
+						<li><a href="/archives">归档|Archives</a></li>
+					
+						<li><a href="/about">关于|About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:github.com/x-hansong">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
   
-  <entry>
-    <title><![CDATA[spice源码分析之server]]></title>
-    <link href="https://github.com/x-hansong/2015/07/29/spice%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B9%8Bserver/"/>
-    <id>https://github.com/x-hansong/2015/07/29/spice源码分析之server/</id>
-    <published>2015-07-29T08:29:33.000Z</published>
-    <updated>2015-08-19T07:25:20.000Z</updated>
-    <content type="html"><![CDATA[<p><em>注:下面的分析省略了所有关于迁移功能的函数与变量.只注重分析关键性函数和变量.</em></p>
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/07/29/spice源码分析之server/" title="spice源码分析之server" itemprop="url">spice源码分析之server</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Yonah-潇" target="_blank" itemprop="author">Yonah-潇</a>
+		
+  <p class="article-time">
+    <time datetime="2015-07-29T08:29:33.000Z" itemprop="datePublished"> 发表于 2015-07-29</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#spice-h"><span class="toc-number">1.</span> <span class="toc-text">spice.h</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#公开的函数接口"><span class="toc-number">1.1.</span> <span class="toc-text">公开的函数接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#定义spice的各种接口:"><span class="toc-number">1.2.</span> <span class="toc-text">定义spice的各种接口:</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#重要结构体"><span class="toc-number">1.3.</span> <span class="toc-text">重要结构体</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#SpiceServer"><span class="toc-number">1.3.1.</span> <span class="toc-text">SpiceServer</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#channels"><span class="toc-number">2.</span> <span class="toc-text">channels</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#red_channel-h"><span class="toc-number">2.1.</span> <span class="toc-text">red_channel.h</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#重要结构体-1"><span class="toc-number">2.1.1.</span> <span class="toc-text">重要结构体</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#重要函数"><span class="toc-number">2.1.2.</span> <span class="toc-text">重要函数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#main_channel-h"><span class="toc-number">2.2.</span> <span class="toc-text">main_channel.h</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#重要结构体-2"><span class="toc-number">2.2.1.</span> <span class="toc-text">重要结构体</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#inputs_channel-h"><span class="toc-number">2.3.</span> <span class="toc-text">inputs_channel.h</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#重要结构体-3"><span class="toc-number">2.3.1.</span> <span class="toc-text">重要结构体</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#静态变量"><span class="toc-number">2.3.2.</span> <span class="toc-text">静态变量</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CommonChannel"><span class="toc-number">2.4.</span> <span class="toc-text">CommonChannel</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#dispatcher"><span class="toc-number">3.</span> <span class="toc-text">dispatcher</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#dispatcher-h"><span class="toc-number">3.1.</span> <span class="toc-text">dispatcher.h</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#重要结构体-4"><span class="toc-number">3.1.1.</span> <span class="toc-text">重要结构体</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#重要函数-1"><span class="toc-number">3.1.2.</span> <span class="toc-text">重要函数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#red_dispatcher-h"><span class="toc-number">3.2.</span> <span class="toc-text">red_dispatcher.h</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#重要结构体-5"><span class="toc-number">3.2.1.</span> <span class="toc-text">重要结构体</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#重要函数-2"><span class="toc-number">3.2.2.</span> <span class="toc-text">重要函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#处理的消息类型"><span class="toc-number">3.2.3.</span> <span class="toc-text">处理的消息类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#消息处理函数"><span class="toc-number">3.2.4.</span> <span class="toc-text">消息处理函数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#main_dispatcher-h"><span class="toc-number">3.3.</span> <span class="toc-text">main_dispatcher.h</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#重要结构体-6"><span class="toc-number">3.3.1.</span> <span class="toc-text">重要结构体</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#重要函数-3"><span class="toc-number">3.3.2.</span> <span class="toc-text">重要函数</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#red_worker-h"><span class="toc-number">4.</span> <span class="toc-text">red_worker.h</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#重要结构体-7"><span class="toc-number">4.1.</span> <span class="toc-text">重要结构体</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#重要函数-4"><span class="toc-number">4.2.</span> <span class="toc-text">重要函数</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#spice_timer_queue-h"><span class="toc-number">5.</span> <span class="toc-text">spice_timer_queue.h</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#重要结构体-8"><span class="toc-number">5.1.</span> <span class="toc-text">重要结构体</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#reds_stream-h"><span class="toc-number">6.</span> <span class="toc-text">reds_stream.h</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#重要结构体-9"><span class="toc-number">6.1.</span> <span class="toc-text">重要结构体</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#spicevmc-c"><span class="toc-number">7.</span> <span class="toc-text">spicevmc.c</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#重要结构体-10"><span class="toc-number">7.1.</span> <span class="toc-text">重要结构体</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#重要函数-5"><span class="toc-number">7.2.</span> <span class="toc-text">重要函数</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#char_device-h"><span class="toc-number">8.</span> <span class="toc-text">char_device.h</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#重要结构体-11"><span class="toc-number">8.1.</span> <span class="toc-text">重要结构体</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<p><em>注:下面的分析省略了所有关于迁移功能的函数与变量.只注重分析关键性函数和变量.</em></p>
 <h1 id="spice-h">spice.h</h1><h2 id="公开的函数接口">公开的函数接口</h2><p><strong>部分宏定义</strong></p>
 <ul>
 <li><strong>SPICE_GNUC_DEPRECATED</strong>,其定义是<code>#define SPICE_GNUC_DEPRECATED  __attribute__((__deprecated__))</code>表示该函数以及被弃用,在编译时会给出警告</li>
@@ -373,478 +349,404 @@
 <li><strong>SpiceCharDeviceState</strong><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> running;</span><br><span class="line"><span class="keyword">int</span> active; <span class="comment">/* has read/write been performed since the device was started */</span></span><br><span class="line"><span class="keyword">int</span> wait_for_migrate_data;</span><br><span class="line"><span class="keyword">uint32_t</span> refs;</span><br><span class="line"></span><br><span class="line">Ring write_queue;</span><br><span class="line">Ring write_bufs_pool;</span><br><span class="line">SpiceCharDeviceWriteBuffer *cur_write_buf;</span><br><span class="line"><span class="keyword">uint8_t</span> *cur_write_buf_pos;</span><br><span class="line">SpiceTimer *<span class="keyword">write_to_dev_t</span>imer;</span><br><span class="line"><span class="keyword">uint64_t</span> <span class="keyword">num_self_t</span>okens;</span><br><span class="line"></span><br><span class="line">Ring clients; <span class="comment">/* list of SpiceCharDeviceClientState */</span></span><br><span class="line"><span class="keyword">uint32_t</span> num_clients;</span><br><span class="line"></span><br><span class="line"><span class="keyword">uint64_t</span> <span class="keyword">client_t</span>okens_interval; <span class="comment">/* frequency of returning tokens to the client */</span></span><br><span class="line">SpiceCharDeviceInstance *<span class="built_in">sin</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> during_read_from_device;</span><br><span class="line"></span><br><span class="line">SpiceCharDeviceCallbacks cbs;</span><br><span class="line"><span class="keyword">void</span> *opaque;</span><br></pre></td></tr></table></figure>
 </li>
 </ul>
-]]></content>
-    <summary type="html">
-    <![CDATA[<p><em>注:下面的分析省略了所有关于迁移功能的函数与变量.只注重分析关键性函数和变量.</em></p>
-<h1 id="spice-h">spice.h</h1><h2 id="公开的函数接口">公开的函数接口</h2><p><strong>部分宏定义</strong><]]>
-    </summary>
-    
-      <category term="spice" scheme="https://github.com/x-hansong/tags/spice/"/>
-    
-      <category term="spice源码分析" scheme="https://github.com/x-hansong/categories/spice%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/"/>
-    
-  </entry>
   
-  <entry>
-    <title><![CDATA[理解链接之链接的基本概念]]></title>
-    <link href="https://github.com/x-hansong/2015/07/19/%E9%93%BE%E6%8E%A5%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/"/>
-    <id>https://github.com/x-hansong/2015/07/19/链接的基本概念/</id>
-    <published>2015-07-19T05:29:13.000Z</published>
-    <updated>2015-07-29T07:01:45.000Z</updated>
-    <content type="html"><![CDATA[<h1 id="前言">前言</h1><p>我们知道，开发程序的基本流程是：设计-代码编写-编译-链接-执行</p>
-<p>每一个步骤展开都是一个很大的课题，链接是一个被人忽略的课题，因为它并不是很复杂，相对于编译来说它还是比较简单的，但是并不代表它不重要。<br>现在编译链接的环节基本上由IDE帮助我们完成了，于是我们很少关注编译链接。虽然说不懂编译链接对开发程序并没有很大影响，但是如果要成为大牛，计算机底层的知识还是要掌握的。<br>编译的知识很多，不是几篇文章能说完的，推荐看《编译原理》。</p>
-<p>这篇文章以及几篇相关的文章将参考《深入理解计算机系统》这本书，对链接作一些介绍。</p>
-<h1 id="链接的基本概念">链接的基本概念</h1><blockquote>
-<p>链接(linking)就是将不同部分的代码和数据收集和组合成为一个单一文件的过程，这个文件可被加载或拷贝到内存并执行。</p>
-</blockquote>
-<p>简单来说，就是把程序用到的所有源文件的目标文件合成一个可执行目标文件，是一个“多合一”的过程。</p>
-<p>链接的执行时机包括：</p>
-<ul>
-<li><strong>编译时</strong>：源代码被翻译为机器码的时候。</li>
-<li><strong>加载时</strong>：程序被加载器加载到内存并执行的时候。</li>
-<li><strong>运行时</strong>：由应用程序执行。</li>
-</ul>
-<p>在早期计算机系统中，链接是手动执行的。在现代计算机系统中，链接是由链接器自动执行的。</p>
-<h1 id="链接的意义">链接的意义</h1><p>链接器在软件开发中扮演了关键的角色，它使得分离编译成为可能。我们不用将一个大小的应用程序组织成一个巨大的源文件，而是可以把它分解成为更小的，更好管理的模块，可以独立的修改和编译这些模块，最终由链接器链接成为一个可执行文件。</p>
-<h1 id="为什么要学习链接的知识">为什么要学习链接的知识</h1><p>链接通常是由链接器处理的，不需要我们插手。但是这是在没有错误产生的情况下，一旦错误产生，不理解链接的工作过程和知识，我们就无法排除错误。以下列出学习链接的几个理由：</p>
-<ul>
-<li><strong>理解链接器将帮助你构造大型程序</strong>。构造大型程序的程序员经常会遇到由于缺少模块，库和不兼容库版本引起的链接器错误。除非你理解链接器是如何解析引用，什么是库，以及链接器是如何使用库来解析引用的，否则你无处着手处理错误。</li>
-<li><strong>理解链接器将帮助你避免一些危险的编程错误</strong>。默认情况下，乱用全局变量在链接时是不会产生警告的，这样的错误难以调试。理解链接器将让你知道原因，如何避免。</li>
-<li><strong>理解链接将帮助你理解语言的作用域规则是如何实现的</strong>。</li>
-<li><strong>理解链接将帮助你理解其他重要的系统概念</strong>。</li>
-<li><strong>理解链接将使你能够开发共享库</strong>。</li>
-</ul>
-<h1 id="简单的链接过程">简单的链接过程</h1><p>来看一个简单的静态链接过程，对链接有一个感性的认识。</p>
-<img src="/2015/07/19/链接的基本概念/00.png" alt="[static linking]" title="[static linking]">
-<p>源代码经过编译器翻译为汇编语言文件，再经过汇编器翻译为可重定向目标文件，最后由链接器链接为可执行目标文件。<br>(ccl:C编译器, as:汇编器, ld:链接器)</p>
-<p>为了创建可执行文件，链接器要完成两个任务：</p>
-<ul>
-<li><strong>符号解析</strong>。目标文件定义和引用符号。符号解析的目的是将每个符号引用和一个符号定义联系起来。</li>
-<li><strong>重定位</strong>。编译器和汇编器生产从地址零开始的代码和数据节。链接器通过把每个符号定义与一个存储器地址联系起来，然后修改所有对这些符号的引用，使得它们指向这个存储器地址，从而重定位这些节。</li>
-</ul>
-<h1 id="目标文件">目标文件</h1><ul>
-<li><strong>可重定位目标文件</strong>。包含二进制代码和数据，其形式可以在编译时与其他可重定位目标文件合并起来，创建一个可执行目标文件。</li>
-<li><strong>可执行目标文件</strong>。包含二进制代码和数据，其形式可以直接被拷贝到内存并执行。</li>
-<li><strong>共享目标文件</strong>。一种特殊类型的可重定位目标文件，可以在加载或运行时，被动态加载到存储器并链接。</li>
-</ul>
-<h2 id="可重定位目标文件">可重定位目标文件</h2><img src="/2015/07/19/链接的基本概念/01.png" alt="[典型的ELF可重定位目标文件]" title="[典型的ELF可重定位目标文件]">
-<ul>
-<li><strong>ELF header</strong>:前16个字节描述了字的大小和生产该文件系统的字节顺序，剩下的包含帮助链接器解析和解释目标文件的信息。</li>
-<li><strong>.text</strong>:已编译程序的机器代码</li>
-<li><strong>.rodata</strong>:只读数据</li>
-<li><strong>.data</strong>:已初始化的全局C变量</li>
-<li><strong>.bss</strong>:未初始化的全局C变量，不占空间</li>
-<li><strong>.symtab</strong>:符号表，存放程序中被定义和引用的函数和全局变量的信息。</li>
-<li><strong>.rel.text</strong>:一个.text节位置列表，保存跟其他文件链接之后需要修改的项</li>
-<li><strong>.rel.data</strong>:记录被模块定义或引用的全局变量的重定位信息</li>
-<li><strong>.debug</strong>:调试符号表</li>
-<li><strong>.line</strong>:源代码行号和.text节中机器码的映射,用于调试.</li>
-<li><strong>.strtab</strong>:一个字符串表包含.symtab和.debug的符号表还有其节头部名.</li>
-</ul>
-<h2 id="可执行目标文件">可执行目标文件</h2><img src="/2015/07/19/链接的基本概念/05.png" alt="[典型的ELF可执行目标文件]" title="[典型的ELF可执行目标文件]">
-<p>从上图可以看出，可执行目标文件被分为三个部分：</p>
-<ul>
-<li><strong>代码段</strong>:只读内存段</li>
-<li><strong>数据段</strong>:可读写内存段</li>
-<li><strong>符号表和调试信息</strong>:这些数据不会在执行时不会被加载到内存中.</li>
-</ul>
-]]></content>
-    <summary type="html">
-    <![CDATA[<h1 id="前言">前言</h1><p>我们知道，开发程序的基本流程是：设计-代码编写-编译-链接-执行</p>
-<p>每一个步骤展开都是一个很大的课题，链接是一个被人忽略的课题，因为它并不是很复杂，相对于编译来说它还是比较简单的，但是并不代表它不重要。<br>现在编译链接的]]>
-    </summary>
-    
-      <category term="链接" scheme="https://github.com/x-hansong/tags/%E9%93%BE%E6%8E%A5/"/>
-    
-      <category term="理解链接" scheme="https://github.com/x-hansong/categories/%E7%90%86%E8%A7%A3%E9%93%BE%E6%8E%A5/"/>
-    
-  </entry>
-  
-  <entry>
-    <title><![CDATA[桌面虚拟化传输协议之android spice]]></title>
-    <link href="https://github.com/x-hansong/2015/07/16/%E6%A1%8C%E9%9D%A2%E8%99%9A%E6%8B%9F%E5%8C%96%E4%BC%A0%E8%BE%93%E5%8D%8F%E8%AE%AE%E4%B9%8Bandroid-spice/"/>
-    <id>https://github.com/x-hansong/2015/07/16/桌面虚拟化传输协议之android-spice/</id>
-    <published>2015-07-16T04:46:15.000Z</published>
-    <updated>2015-08-20T07:18:10.000Z</updated>
-    <content type="html"><![CDATA[<h1 id="背景">背景</h1><p>云计算是目前计算机领域的一个热门领域，桌面虚拟化是其中的一个重要应用，即把桌面系统在服务器端虚拟化，然后通过传输协议传输数据到客户端来实现桌面虚拟化，这样的好处就在于不管用什么设备，只要通过客户端都可以访问到云端的系统，随时随地都可以在一个系统上工作。</p>
-<p>目前有两大标准的桌面传输协议，分别是RBP和RDP。</p>
-<ul>
-<li>RBP有一个简单的架构，即直接把虚拟机的图形数据直接传输给客户端，客户端直接显示图像，有点类似于看网络视频。这样子就对网络的要求较高，高延迟情况下效果很差，但是客户端压力比较小，因此对客户机的性能要求较低，毕竟它只负责显示图像。</li>
-</ul>
-<img src="/2015/07/16/桌面虚拟化传输协议之android-spice/01.png" alt="[RBP]" title="[RBP]">
-<ul>
-<li>RDP稍微复杂一点，使用的是图像局部刷新，它发送事件消息给客户端，提示需要刷新的图像区域并且提供数据，客户端根据消息数据生成图像数据显示出来。因此传输的数据量较少，适合于网络不好情况，但是缺点是客户端需要生成图像数据，对客户机有一定压力。</li>
-</ul>
-<img src="/2015/07/16/桌面虚拟化传输协议之android-spice/02.png" alt="[RDP]" title="[RDP]">
-<p>那么对于移动设备来说，很显然，RDP协议更适合移动设备，因为移动设备在3G，4G情况下不可能用耗费大流量的RFB协议，并且延迟比较高。而RDP协议由于传输的数据量较少，对网络条件要求不高。所以，针对于移动平台来说，RDP协议比较合适。</p>
-<p>但是，由于RDP协议是微软的产品，受限于其证书，并不是开源产品，所以不能用于移动设备。那么，开源的类RDP协议的<a href="http://www.spice-space.org" target="_blank" rel="external">SPICE</a>协议,就隆重登场了，结合我们的主题，在android平台上应用spice协议。下面，我们来介绍spice在android平台上的应用。</p>
-<h1 id="SPICE_协议在android平台的应用">SPICE 协议在android平台的应用</h1><p>Spice事实上并没有android版本，但是它有linux版本，而android是基于linux的，所以，我们可以通过使用NDK来交叉编译Spice库到android上使用。也就是说，我们可以通过使用JNI来调用libspice.so（通过NDK交叉编译），从而在android平台上使用Spice。</p>
-<img src="/2015/07/16/桌面虚拟化传输协议之android-spice/04.png" alt="[android spice]" title="[android spice]">
-<p>Spice服务器通过通道(Channel)来与客户端通信，其中jpeg模块是通过NDK编译好的库，使用JNI调用，把服务器发送过来图像命令转化为图像，再把图像交给android的View显示出来。</p>
-<p>在实际使用中，需要对图像的解析过程进行优化，否则显示的延迟很大。一个解决方案是使用更快的jpeg解析库。</p>
-<p>最后,推荐一个开源的spice安卓客户端<a href="https://github.com/iiordanov/remote-desktop-clients">remote-desktop-clients</a></p>
-<p>以上只是对Spice工作原理的简单描述，详细介绍查看官方文档：</p>
-<ul>
-<li><a href="http://www.spice-space.org/docs/spice_for_newbies.pdf" target="_blank" rel="external">spice_for_newbies</a></li>
-<li><a href="http://xhansong.gitbooks.io/spice-guidebook/" target="_blank" rel="external">spice入门</a>(这是我根据spice官方文档翻译的中文版本)</li>
-</ul>
-]]></content>
-    <summary type="html">
-    <![CDATA[<h1 id="背景">背景</h1><p>云计算是目前计算机领域的一个热门领域，桌面虚拟化是其中的一个重要应用，即把桌面系统在服务器端虚拟化，然后通过传输协议传输数据到客户端来实现桌面虚拟化，这样的好处就在于不管用什么设备，只要通过客户端都可以访问到云端的系统，随时随地都可以在]]>
-    </summary>
-    
-      <category term="spice" scheme="https://github.com/x-hansong/tags/spice/"/>
-    
-      <category term="虚拟化" scheme="https://github.com/x-hansong/tags/%E8%99%9A%E6%8B%9F%E5%8C%96/"/>
-    
-      <category term="虚拟化" scheme="https://github.com/x-hansong/categories/%E8%99%9A%E6%8B%9F%E5%8C%96/"/>
-    
-  </entry>
-  
-  <entry>
-    <title><![CDATA[算法学习之减治法(decrease and conquer)]]></title>
-    <link href="https://github.com/x-hansong/2015/06/22/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E4%B9%8B%E5%87%8F%E6%B2%BB%E6%B3%95-decrease-and-conquer/"/>
-    <id>https://github.com/x-hansong/2015/06/22/算法学习之减治法-decrease-and-conquer/</id>
-    <published>2015-06-22T02:55:13.000Z</published>
-    <updated>2015-07-16T08:07:01.000Z</updated>
-    <content type="html"><![CDATA[<h1 id="什么是分治法">什么是分治法</h1><p>减治技术利用了一个问题给定实例的解和同样问题较小实例的解之间的某种关系。一旦建立了这种关系，就可以从顶至下递归的来用该关系，也可以从底至上非递归的来运用该关系：</p>
-<ol>
-<li>减去一个常量</li>
-<li>减去一个常量因子</li>
-<li>减去的规模是可变的</li>
-</ol>
-<h1 id="分治法例子">分治法例子</h1><h2 id="减去一个常量">减去一个常量</h2><h3 id="拓扑排序">拓扑排序</h3><h4 id="定义">定义</h4><p>定义：将有向图中的顶点以线性方式进行排序。即对于任何连接自顶点u到顶点v的有向边uv，在最后的排序结果中，顶点u总是在顶点v的前面。</p>
-<h4 id="两张实现算法">两张实现算法</h4><h5 id="Kahn算法">Kahn算法</h5><pre><code><span class="keyword">L</span>← Empty <span class="keyword">list</span> that will contain the sorted elements
-S ← <span class="keyword">Set</span> of all nodes with <span class="keyword">no</span> incoming edges
-<span class="keyword">while</span> S is non-empty <span class="keyword">do</span>
-    remove a node <span class="keyword">n</span> from <span class="literal">S</span>
-    insert <span class="keyword">n</span> into <span class="keyword">L</span>
-    <span class="keyword">foreach</span> node <span class="keyword">m</span> with <span class="keyword">an</span> edge <span class="keyword">e</span> from <span class="keyword">n</span> to <span class="keyword">m</span> <span class="keyword">do</span>
-        remove edge <span class="keyword">e</span> from the <span class="keyword">graph</span>
-        <span class="keyword">if</span> <span class="keyword">m</span> has <span class="keyword">no</span> other incoming edges then
-            insert <span class="keyword">m</span> into <span class="literal">S</span>
-<span class="keyword">if</span> <span class="keyword">graph</span> has edges then
-    <span class="keyword">return</span> <span class="keyword">error</span> (<span class="keyword">graph</span> has at least onecycle)
-<span class="keyword">else</span> 
-    <span class="keyword">return</span> <span class="keyword">L</span> (a topologically sortedorder)
-</code></pre><p>不难看出该算法的实现十分直观，关键在于需要维护一个入度为0的顶点的集合：<br>每次从该集合中取出(没有特殊的取出规则，随机取出也行，使用队列/栈也行，下同)一个顶点，将该顶点放入保存结果的List中。<br>紧接着循环遍历由该顶点引出的所有边，从图中移除这条边，同时获取该边的另外一个顶点，如果该顶点的入度在减去本条边之后为0，那么也将这个顶点放到入度为0的集合中。然后继续从集合中取出一个顶点…………</p>
-<p>当集合为空之后，检查图中是否还存在任何边，如果存在的话，说明图中至少存在一条环路。不存在的话则返回结果List，此List中的顺序就是对图进行拓扑排序的结果。</p>
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
 
-<p>对上图进行拓扑排序的结果：<br>2-&gt;8-&gt;0-&gt;3-&gt;7-&gt;1-&gt;5-&gt;6-&gt;9-&gt;4-&gt;11-&gt;10-&gt;12</p>
-<p><strong>复杂度分析：</strong><br>初始化入度为0的集合需要遍历整张图，检查每个节点和每条边，因此复杂度为O(E+V);<br>然后对该集合进行操作，又需要遍历整张图中的，每条边，复杂度也为O(E+V);<br>因此Kahn算法的复杂度即为O(E+V)。</p>
-<h5 id="基于DFS的拓扑排序">基于DFS的拓扑排序</h5><pre><code><span class="keyword">L</span> ← Empty <span class="keyword">list</span> that will contain the sorted nodes
-S ← <span class="keyword">Set</span> of all nodes with <span class="keyword">no</span> outgoing edges
-<span class="keyword">for</span> each node <span class="keyword">n</span> <span class="keyword">in</span> S <span class="keyword">do</span>
-    visit(<span class="keyword">n</span>) 
-function visit(node <span class="keyword">n</span>)
-    <span class="keyword">if</span> <span class="keyword">n</span> has not been visited yet then
-        <span class="keyword">mark</span> <span class="keyword">n</span> <span class="keyword">as</span> visited
-        <span class="keyword">for</span> each node <span class="keyword">m</span> with <span class="keyword">an</span> edge from <span class="keyword">m</span> to ndo
-            visit(<span class="keyword">m</span>)
-        add <span class="keyword">n</span> to <span class="keyword">L</span>
-</code></pre><p>DFS的实现更加简单直观，使用递归实现。利用DFS实现拓扑排序，实际上只需要添加一行代码，即上面伪码中的最后一行：add n to L。<br>需要注意的是，将顶点添加到结果List中的时机是在visit方法即将退出之时。<br>这个算法的实现非常简单，但是要理解的话就相对复杂一点。<br>关键在于为什么在visit方法的最后将该顶点添加到一个集合中，就能保证这个集合就是拓扑排序的结果呢？<br>因为添加顶点到集合中的时机是在dfs方法即将退出之时，而dfs方法本身是个递归方法，只要当前顶点还存在边指向其它任何顶点，它就会递归调用dfs方法，而不会退出。因此，退出dfs方法，意味着当前顶点没有指向其它顶点的边了，即当前顶点是一条路径上的最后一个顶点。</p>
-<p><strong>复杂度分析：</strong><br>复杂度同DFS一致，即O(E+V)。具体而言，首先需要保证图是有向无环图，判断图是DAG可以使用基于DFS的算法，复杂度为O(E+V)，而后面的拓扑排序也是依赖于DFS，复杂度为O(E+V)</p>
-<p>还是对上文中的那张有向图进行拓扑排序，只不过这次使用的是基于DFS的算法，结果是：<br>8-&gt;7-&gt;2-&gt;3-&gt;0-&gt;6-&gt;9-&gt;10-&gt;11-&gt;12-&gt;1-&gt;5-&gt;4</p>
-<h5 id="两种实现算法的总结">两种实现算法的总结</h5><p>这两种算法分别使用链表和栈来表示结果集。<br>对于基于DFS的算法，加入结果集的条件是：顶点的出度为0。这个条件和Kahn算法中入度为0的顶点集合似乎有着异曲同工之妙，这两种算法的思想犹如一枚硬币的两面，看似矛盾，实则不然。一个是从入度的角度来构造结果集，另一个则是从出度的角度来构造。</p>
-<p>实现上的一些不同之处：<br>Kahn算法不需要检测图为DAG，如果图为DAG，那么在出度为0的集合为空之后，图中还存在没有被移除的边，这就说明了图中存在环路。<br>而基于DFS的算法需要首先确定图为DAG，当然也能够做出适当调整，让环路的检测和拓扑排序同时进行，毕竟环路检测也能够在DFS的基础上进行。<br>二者的复杂度均为O(V+E)。</p>
-<h2 id="减去一个常量因子">减去一个常量因子</h2><h3 id="Russian_Peasant_Multiplication">Russian Peasant Multiplication</h3><p>计算两个整数的积</p>
-<h4 id="原理">原理</h4><p>n * m = n/2 * m  n为偶数<br>n * m  = (n-1)/2 * 2m + m  (if n &gt; 1  and m if n = 1) n为奇数</p>
-<h4 id="例子">例子</h4>
-<h2 id="减去的规模是可变的">减去的规模是可变的</h2><h3 id="Selection_Problem">Selection Problem</h3><p>找出数组中第n小的数</p>
-<h4 id="原理-1">原理</h4><p>类似与快速排序,只是把key换做数组的下标,通过数的下标作为分割的依据</p>
-<h4 id="例子-1">例子</h4>
-<p><strong>参考资料:</strong><br><a href="http://www.cnblogs.com/kkgreen/archive/2011/06/17/2083915.html" target="_blank" rel="external">减治法（一）</a><br><a href="http://blog.csdn.net/dm_vincent/article/details/7714519" target="_blank" rel="external">拓扑排序的原理及其实现</a></p>
-]]></content>
-    <summary type="html">
-    <![CDATA[<h1 id="什么是分治法">什么是分治法</h1><p>减治技术利用了一个问题给定实例的解和同样问题较小实例的解之间的某种关系。一旦建立了这种关系，就可以从顶至下递归的来用该关系，也可以从底至上非递归的来运用该关系：</p>
-<ol>
-<li>减去一个常量</li>
-<li>]]>
-    </summary>
-    
-      <category term="减治法" scheme="https://github.com/x-hansong/tags/%E5%87%8F%E6%B2%BB%E6%B3%95/"/>
-    
-      <category term="算法" scheme="https://github.com/x-hansong/tags/%E7%AE%97%E6%B3%95/"/>
-    
-      <category term="算法学习" scheme="https://github.com/x-hansong/categories/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0/"/>
-    
-  </entry>
-  
-  <entry>
-    <title><![CDATA[算法学习之分治法(divide and conquer)]]></title>
-    <link href="https://github.com/x-hansong/2015/06/18/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E4%B9%8B%E5%88%86%E6%B2%BB%E6%B3%95-divide-and-conquer/"/>
-    <id>https://github.com/x-hansong/2015/06/18/算法学习之分治法-divide-and-conquer/</id>
-    <published>2015-06-18T10:50:50.000Z</published>
-    <updated>2015-06-19T06:30:04.000Z</updated>
-    <content type="html"><![CDATA[<h2 id="什么是分治法">什么是分治法</h2><p>字面上的解释是“分而治之”，就是把一个复杂的问题分成两个或更多的相同或相似的子问题，直到最后子问题可以简单的直接求解，原问题的解即子问题的解的合并。</p>
-<h2 id="解决问题的流程">解决问题的流程</h2><img src="/2015/06/18/算法学习之分治法-divide-and-conquer/00.png" alt="[divide and conquer]" title="[divide and conquer]">
-<h2 id="分治法适用情况">分治法适用情况</h2><pre><code>分治法所能解决的问题一般具有以下几个特征：
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/spice源码分析/">spice源码分析</a>
+</div>
 
-<span class="bullet">1. </span>该问题的规模缩小到一定的程度就可以容易地解决
 
-<span class="bullet">2. </span>该问题可以分解为若干个规模较小的相同问题，即该问题具有最优子结构性质。
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/spice/">spice</a>
+  </div>
 
-<span class="bullet">3. </span>利用该问题分解出的子问题的解可以合并为该问题的解；
+</div>
 
-<span class="bullet">4. </span>该问题所分解出的各个子问题是相互独立的，即子问题之间不包含公共的子问题。
-</code></pre><p>第一条特征是绝大多数问题都可以满足的，因为问题的计算复杂性一般是随着问题规模的增加而增加；</p>
-<p>第二条特征是应用分治法的前提它也是大多数问题可以满足的，此特征反映了递归思想的应用；、</p>
-<p>第三条特征是关键，能否利用分治法完全取决于问题是否具有第三条特征，如果具备了第一条和第二条特征，而不具备第三条特征，则可以考虑用贪心法或动态规划法。</p>
-<p>第四条特征涉及到分治法的效率，如果各子问题是不独立的则分治法要做许多不必要的工作，重复地解公共的子问题，此时虽然可用分治法，但一般用动态规划法较好。</p>
-<h2 id="应用问题">应用问题</h2><h3 id="归并排序">归并排序</h3><p>可以看到排序问题正好满足以上提到的四个特征。<br>归并排序通过将待排序数组分为两个部分，递归地处理它们，最终将两个排序好的部分合并起来。<br>值得一提的是归并排序通过数组的下标分割子问题，即每次都把数组分为两半。</p>
-<p><strong>伪代码如下</strong><br><img src="/2015/06/18/算法学习之分治法-divide-and-conquer/01.png" alt="[merge_sort]" title="[merge_sort]"></p>
-<img src="/2015/06/18/算法学习之分治法-divide-and-conquer/02.png" alt="[merge]" title="[merge]">
-<p><strong>例子</strong><br><img src="/2015/06/18/算法学习之分治法-divide-and-conquer/03.png" alt="[例子]" title="[例子]"></p>
-<h3 id="快速排序">快速排序</h3><p>跟归并排序的思想是类似的，但是快速排序是根据值来分割子问题，即把数组根据一个值分为大于和小于它两个部分。</p>
-<p><strong>伪代码如下</strong></p>
-<img src="/2015/06/18/算法学习之分治法-divide-and-conquer/04.png" alt="[quick_sort]" title="[quick_sort]">
-<img src="/2015/06/18/算法学习之分治法-divide-and-conquer/05.jpg" alt="[partition]" title="[partition]">
-<p><strong>例子</strong></p>
-<img src="/2015/06/18/算法学习之分治法-divide-and-conquer/06.jpg" alt="[例子]" title="[例子]">
-<h3 id="二分搜索">二分搜索</h3><p>对一个有序的数组进行二分搜索，每次比较中间的值，key大于它说明在右边，小于说明左边。</p>
-<p><strong>伪代码如下</strong></p>
-<img src="/2015/06/18/算法学习之分治法-divide-and-conquer/07.png" alt="[binary_search]" title="[binary_search]">
-<p><strong>例子</strong></p>
-<img src="/2015/06/18/算法学习之分治法-divide-and-conquer/08.png" alt="[例子]" title="[例子]">
-<h3 id="大整数乘法">大整数乘法</h3><p>对于任意位数的2个数相乘 $a * b$ ，写成：<br><span>$$a = a_{1} * 10^{(n_{1}/2)} + a_{0}$$</span><!-- Has MathJax --><br>$n_{1}$为$a$的位数</p>
-<span>$$b = b_{1} * 10^{(n_{2}/2)} + b_{0}$$</span><!-- Has MathJax -->
-<p>$n_{2}$为$b$的位数</p>
-<p>分治策略就是基于以上变换，将a，b写成前一半数字和后一半数字相加的形式，例如若$a = 5423678$，那么$a_{1} = 542$  $a_{0} = 3678$（注意若不是偶数截取较小一半）</p>
-<p>这样a和b相乘就可以写为：<br><span>$$a * b = { a_{1} * 10^{(n_{1}/2)} + a_{0} } * { b_{1} * 10^{(n_{2}/2)} + b_{0} }$$</span><!-- Has MathJax --><br>展开后整理得：<br><span>$$a * b = a_{1}*b_{1} * 10^{[(n_{1}+n_{2})/2]} + a_{1}*b_{0} * 10^{(n_{1}/2)} + a_{0}*b_{1} * 10^{(n_{2}/2)} + a_{0}*b_{0}$$</span><!-- Has MathJax --><br>这样就很容易递归的来求$a * b$，如果嫌分解后的数还太大，就可以继续分解。（你可以自己规定在何时结束递归）</p>
-<h2 id="总结">总结</h2><p>分治法实际上就是类似于数学归纳法，找到解决本问题的求解方程公式，然后根据方程公式设计递归程序。</p>
-<ol>
-<li>一定是先找到最小问题规模时的求解方法</li>
-<li>然后考虑随着问题规模增大时的求解方法</li>
-<li>找到求解的递归函数式后（各种规模或因子），设计递归程序即可。</li>
-</ol>
-<p>参考资料：</p>
-<p><a href="http://www.cnblogs.com/steven_oyj/archive/2010/05/22/1741370.html" target="_blank" rel="external">五大常用算法之一：分治算法</a></p>
-<p><a href="http://www.cnblogs.com/kkgreen/archive/2011/06/12/2078668.html" target="_blank" rel="external">大整数乘法和Strassen矩阵乘法</a></p>
-]]></content>
-    <summary type="html">
-    <![CDATA[<h2 id="什么是分治法">什么是分治法</h2><p>字面上的解释是“分而治之”，就是把一个复杂的问题分成两个或更多的相同或相似的子问题，直到最后子问题可以简单的直接求解，原问题的解即子问题的解的合并。</p>
-<h2 id="解决问题的流程">解决问题的流程</h2><i]]>
-    </summary>
-    
-      <category term="分治法" scheme="https://github.com/x-hansong/tags/%E5%88%86%E6%B2%BB%E6%B3%95/"/>
-    
-      <category term="算法" scheme="https://github.com/x-hansong/tags/%E7%AE%97%E6%B3%95/"/>
-    
-      <category term="算法学习" scheme="https://github.com/x-hansong/categories/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0/"/>
-    
-  </entry>
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="https://github.com/x-hansong/2015/07/29/spice源码分析之server/" data-title="spice源码分析之server | ShareHub" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/08/19/spice源码分析之server-1/" title="spice源码分析之server(1)">
+  <strong>上一篇：</strong><br/>
+  <span>
+  spice源码分析之server(1)</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/07/19/链接的基本概念/"  title="理解链接之链接的基本概念">
+ <strong>下一篇：</strong><br/> 
+ <span>理解链接之链接的基本概念
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comments" class="comment">
+	<div class="ds-thread" data-thread-key="2015/07/29/spice源码分析之server/" data-title="spice源码分析之server" data-url="https://github.com/x-hansong/2015/07/29/spice源码分析之server/"></div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#spice-h"><span class="toc-number">1.</span> <span class="toc-text">spice.h</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#公开的函数接口"><span class="toc-number">1.1.</span> <span class="toc-text">公开的函数接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#定义spice的各种接口:"><span class="toc-number">1.2.</span> <span class="toc-text">定义spice的各种接口:</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#重要结构体"><span class="toc-number">1.3.</span> <span class="toc-text">重要结构体</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#SpiceServer"><span class="toc-number">1.3.1.</span> <span class="toc-text">SpiceServer</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#channels"><span class="toc-number">2.</span> <span class="toc-text">channels</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#red_channel-h"><span class="toc-number">2.1.</span> <span class="toc-text">red_channel.h</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#重要结构体-1"><span class="toc-number">2.1.1.</span> <span class="toc-text">重要结构体</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#重要函数"><span class="toc-number">2.1.2.</span> <span class="toc-text">重要函数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#main_channel-h"><span class="toc-number">2.2.</span> <span class="toc-text">main_channel.h</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#重要结构体-2"><span class="toc-number">2.2.1.</span> <span class="toc-text">重要结构体</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#inputs_channel-h"><span class="toc-number">2.3.</span> <span class="toc-text">inputs_channel.h</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#重要结构体-3"><span class="toc-number">2.3.1.</span> <span class="toc-text">重要结构体</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#静态变量"><span class="toc-number">2.3.2.</span> <span class="toc-text">静态变量</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CommonChannel"><span class="toc-number">2.4.</span> <span class="toc-text">CommonChannel</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#dispatcher"><span class="toc-number">3.</span> <span class="toc-text">dispatcher</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#dispatcher-h"><span class="toc-number">3.1.</span> <span class="toc-text">dispatcher.h</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#重要结构体-4"><span class="toc-number">3.1.1.</span> <span class="toc-text">重要结构体</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#重要函数-1"><span class="toc-number">3.1.2.</span> <span class="toc-text">重要函数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#red_dispatcher-h"><span class="toc-number">3.2.</span> <span class="toc-text">red_dispatcher.h</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#重要结构体-5"><span class="toc-number">3.2.1.</span> <span class="toc-text">重要结构体</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#重要函数-2"><span class="toc-number">3.2.2.</span> <span class="toc-text">重要函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#处理的消息类型"><span class="toc-number">3.2.3.</span> <span class="toc-text">处理的消息类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#消息处理函数"><span class="toc-number">3.2.4.</span> <span class="toc-text">消息处理函数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#main_dispatcher-h"><span class="toc-number">3.3.</span> <span class="toc-text">main_dispatcher.h</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#重要结构体-6"><span class="toc-number">3.3.1.</span> <span class="toc-text">重要结构体</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#重要函数-3"><span class="toc-number">3.3.2.</span> <span class="toc-text">重要函数</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#red_worker-h"><span class="toc-number">4.</span> <span class="toc-text">red_worker.h</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#重要结构体-7"><span class="toc-number">4.1.</span> <span class="toc-text">重要结构体</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#重要函数-4"><span class="toc-number">4.2.</span> <span class="toc-text">重要函数</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#spice_timer_queue-h"><span class="toc-number">5.</span> <span class="toc-text">spice_timer_queue.h</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#重要结构体-8"><span class="toc-number">5.1.</span> <span class="toc-text">重要结构体</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#reds_stream-h"><span class="toc-number">6.</span> <span class="toc-text">reds_stream.h</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#重要结构体-9"><span class="toc-number">6.1.</span> <span class="toc-text">重要结构体</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#spicevmc-c"><span class="toc-number">7.</span> <span class="toc-text">spicevmc.c</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#重要结构体-10"><span class="toc-number">7.1.</span> <span class="toc-text">重要结构体</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#重要函数-5"><span class="toc-number">7.2.</span> <span class="toc-text">重要函数</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#char_device-h"><span class="toc-number">8.</span> <span class="toc-text">char_device.h</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#重要结构体-11"><span class="toc-number">8.1.</span> <span class="toc-text">重要结构体</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
   
-  <entry>
-    <title><![CDATA[算法学习之暴力求解(brute force)]]></title>
-    <link href="https://github.com/x-hansong/2015/06/18/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E4%B9%8B%E6%9A%B4%E5%8A%9B%E6%B1%82%E8%A7%A3-brute-force/"/>
-    <id>https://github.com/x-hansong/2015/06/18/算法学习之暴力求解-brute-force/</id>
-    <published>2015-06-18T08:53:51.000Z</published>
-    <updated>2015-06-19T05:53:27.000Z</updated>
-    <content type="html"><![CDATA[<h2 id="暴力求解(brute_force)">暴力求解(brute force)</h2><blockquote>
-<p>Brute force is a straightforward approach to solving a problem, usually directly based on the problem statement and definitions of the concepts involved.</p>
-</blockquote>
-<p>暴力求解即根据问题的描述和定义直接求解,不使用一些特殊的算法.</p>
-<h3 id="排序问题的应用">排序问题的应用</h3><ul>
-<li><p>选择排序<br>选择排序将数组分为排序与未排序两个部分,每次将从未排序部分取出最小的值,插入排序部分的最后,最终未排序部分消失,排序完成.</p>
-</li>
-<li><p>冒泡排序<br>冒泡排序也是将数组分为排序与未排序两个部分,每次从未排序部分的第一个数开始,与后一个比较,如果大于它两两交换,否则从第二个开始继续与后一个比较.最终未排序部分的最后一个数即最大的数.循环n次即完成排序.</p>
-</li>
-</ul>
-<h3 id="搜索问题的应用">搜索问题的应用</h3><ul>
-<li><p>线性搜索<br>简单粗暴,一个个比较.</p>
-</li>
-<li><p>字符串匹配<br>同样道理,逐个比较.</p>
-</li>
-</ul>
-<h3 id="几何问题">几何问题</h3><ul>
-<li><p>最近点问题<br>把所有两点距离求出来,然后选择最小值.</p>
-</li>
-<li><p>凸包问题<br>用循序渐进的方式求取给定点集的凸包，首先把最初输入的3个不共线(Non-collinear)的点按 逆时针方向构成一个三角形，这就是这3点的凸包。接着便会考察第4点，看看这个点是否位于前述三 角形之内或三角形的边上。若是，则这第4点并非凸包上的点，前述三角形保持不变。若否，则把这前述的三角 形扩大为一个四边形，并把不适用的边擦去。这个四边形便是这首4点的凸包。接着程序又会考察第5点，如此 类推，直至所有点均已被考察为止.由于每次都要检查所有之前的点，时间复杂度为O(n^2).</p>
-</li>
-</ul>
-<h3 id="穷举搜索">穷举搜索</h3><p>以下3个问题都可以用穷举的方法暴力求解,把所有可能都试一遍.然而实际上由于可能情况太多,一般不会使用穷举的方法.数据量小的情况可以考虑使用.每个问题都有不少更优的算法.</p>
-<ul>
-<li><p>旅行推销员问题(Travelling Salesman Problem)    有n个城市，一个推销员要从其中某一个城市出发，唯一走遍所有的城市，再回到他出发的城市，求最短的路线。也即求一个最短的哈密顿回路。</p>
-</li>
-<li><p>背包问题(knapsack problem)<br>给定一组物品，每种物品都有自己的重量和价格，在限定的总重量内，我们如何选择，才能使得物品的总价格最高。</p>
-</li>
-<li><p>任务分配问题(assignment problem)<br>线性任务分配问题：P是二元组(a, b)的集合，其中a和b分别是集合A和B中的元素。C是某一函数，并满足特定约束条件，例如：A的每一个元素必须在P中出现一次，或者B的每一个元素必须在P中出现一次，或者以上二者都必须满足。线性任务分配问题的目标就是最大化或者最小化C(a, b)之和。</p>
-</li>
-</ul>
-<h3 id="总结">总结</h3><pre><code>暴力求解法可以说毫无技巧,但是简单容易实现.一般情况是不会用到的,但是在特定情况下有奇效.可以说当人们解决某个问题的时候用暴力求解应该是第一直觉,然而这太简单并不能体现自己的能力,就会开始寻找更快的方法.我的理解是更优的算法应该是基于暴力求解法之上的.例如说背包问题,同样样遍历所有情况,动态规划巧妙的利用前面的尝试过的数据,减少了工作量.但本质上还是要试遍所有可能,只是试的少了.
-</code></pre>]]></content>
-    <summary type="html">
-    <![CDATA[<h2 id="暴力求解(brute_force)">暴力求解(brute force)</h2><blockquote>
-<p>Brute force is a straightforward approach to solving a problem, usually dir]]>
-    </summary>
-    
-      <category term="暴力求解" scheme="https://github.com/x-hansong/tags/%E6%9A%B4%E5%8A%9B%E6%B1%82%E8%A7%A3/"/>
-    
-      <category term="算法" scheme="https://github.com/x-hansong/tags/%E7%AE%97%E6%B3%95/"/>
-    
-      <category term="算法学习" scheme="https://github.com/x-hansong/categories/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0/"/>
-    
-  </entry>
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/Hexo/" title="Hexo">Hexo<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/spice源码分析/" title="spice源码分析">spice源码分析<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/理解链接/" title="理解链接">理解链接<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/算法学习/" title="算法学习">算法学习<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/虚拟化/" title="虚拟化">虚拟化<sup>2</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
   
-  <entry>
-    <title><![CDATA[算法学习之算法基本概念]]></title>
-    <link href="https://github.com/x-hansong/2015/06/18/%E7%AE%97%E6%B3%95%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/"/>
-    <id>https://github.com/x-hansong/2015/06/18/算法基本概念/</id>
-    <published>2015-06-18T08:18:24.000Z</published>
-    <updated>2015-06-18T08:58:51.000Z</updated>
-    <content type="html"><![CDATA[<h2 id="算法的定义">算法的定义</h2><blockquote>
-<p>An algorithm is a sequence of unambiguous instructions for solving a problem</p>
-</blockquote>
-<p>即算法是解决问题的无二义性的指令序列.简单说就是用来解决问题步骤.</p>
-<h2 id="算法设计及实现流程">算法设计及实现流程</h2><p><img src="http://img.blog.csdn.net/20150615181318512" alt="算法设计及实现流程"></p>
-<h2 id="重要的问题类型">重要的问题类型</h2><ul>
-<li>Sorting</li>
-<li>Searching</li>
-<li>String processing</li>
-<li>Graph problems</li>
-<li>Combinatorial problems</li>
-<li>Geometric problems</li>
-<li>Numerical Problems</li>
-</ul>
-<h2 id="基础数据结构">基础数据结构</h2><ul>
-<li>linear data structure<ul>
-<li>array</li>
-<li>list</li>
-<li>stack</li>
-<li>queue</li>
-</ul>
-</li>
-<li>graphs</li>
-<li>tree</li>
-<li>set and dictionaries</li>
-</ul>
-<h2 id="常用的算法思想">常用的算法思想</h2><ul>
-<li>Brute force (暴力求解)</li>
-<li>Divide and conquer (分治法)</li>
-<li>Decrease and conquer (减治法)</li>
-<li>Transform and conquer (转治法)</li>
-<li>Space and time tradeoffs (时空权衡)</li>
-<li>Greedy approach (贪婪算法)</li>
-<li>Dynamic programming (动态规划)</li>
-<li>Iterative improvement (迭代改进)</li>
-<li>Backtracking (回溯法)</li>
-<li><p>Branch and bound (分支界限法)</p>
-<p>  基本上,算法就是围绕上面提到的问题和数据结构进行研究,遇到某个问题时,先分析问题,确定问题类型和使用的数据结构,有利于快速找到头绪.</p>
-</li>
-</ul>
-]]></content>
-    <summary type="html">
-    <![CDATA[<h2 id="算法的定义">算法的定义</h2><blockquote>
-<p>An algorithm is a sequence of unambiguous instructions for solving a problem</p>
-</blockquote>
-<p>即]]>
-    </summary>
-    
-      <category term="算法" scheme="https://github.com/x-hansong/tags/%E7%AE%97%E6%B3%95/"/>
-    
-      <category term="算法学习" scheme="https://github.com/x-hansong/categories/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0/"/>
-    
-  </entry>
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/算法/" title="算法">算法<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/spice/" title="spice">spice<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/链接/" title="链接">链接<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/暴力求解/" title="暴力求解">暴力求解<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/分治法/" title="分治法">分治法<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/减治法/" title="减治法">减治法<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/hexo/" title="hexo">hexo<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/github/" title="github">github<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/虚拟化/" title="虚拟化">虚拟化<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
   
-  <entry>
-    <title><![CDATA[用hexo搭建github博客]]></title>
-    <link href="https://github.com/x-hansong/2015/06/17/%E7%94%A8hexo%E6%90%AD%E5%BB%BAgithub%E5%8D%9A%E5%AE%A2/"/>
-    <id>https://github.com/x-hansong/2015/06/17/用hexo搭建github博客/</id>
-    <published>2015-06-17T02:14:18.000Z</published>
-    <updated>2015-08-04T03:30:22.000Z</updated>
-    <content type="html"><![CDATA[<h1 id="背景">背景</h1><p><strong>搭建环境:Linux,nodejs,npm,git</strong></p>
-<p>现在网上已经有很多关于搭建hexo github博客的文章,我自己也是参考别人的文章过来的,但是现在hexo已经到了3.0版本,很多教程都过时了,而且感觉他们教程的思路着重于怎么做,并没有说明背后的原因,所以我希望写一篇着重于<strong>为什么</strong>,而不是怎么做的文章.我相信只有理解背后的原理才能更好更快的上手.</p>
-<p>其次,最好的教程就是官方文档,所以在这篇文章我引用的都是官方文档的内容,而且只是提供思路,不提供详细步骤.因为版本更新之后,操作是不一样的,官方文档会随时更新,但是这篇文章不一定会随时更新,然而思路是不变的,所以我极力推荐大家首先阅读官方文档.</p>
-<h2 id="什么是Github_Page">什么是Github Page</h2><p>首先,所谓的github博客是通过github page来实现的.</p>
-<p>简单的说，Github是一个具有版本管理功能的代码仓库，每个项目都有一个主页，列出项目的源文件。</p>
-<p>但是对于一个新手来说，看到一大堆源码，只会让人头晕脑涨，不知何处入手。<br>他希望看到的是，一个简明易懂的网页，说明每一步应该怎么做。</p>
-<p>因此，github就设计了Pages功能，允许用户自定义项目首页，用来替代默认的源码列表。</p>
-<p>所以，github Pages可以被认为是用户编写的、托管在github上的静态网页。</p>
-<h2 id="什么是Hexo">什么是Hexo</h2><blockquote>
-<p>Hexo 是一个快速、简洁且高效的博客框架。Hexo 使用 Markdown（或其他渲染引擎）解析文章，在几秒内，即可利用靓丽的主题生成静态网页。</p>
-</blockquote>
-<p>我们主要是用hexo在本地写博客,然后上传到github page,就像你commit项目代码到github一样.</p>
-<h1 id="操作">操作</h1><h2 id="建立一个Github_page">建立一个Github page</h2><p>首先注册个github账户,然后在本地配置ssh到github,这一步自行google.</p>
-<blockquote>
-<h2 id="Create_a_repository">Create a repository</h2><p>Head over to GitHub and create a new repository named username.github.io, where username is your username (or organization name) on GitHub.</p>
-<p>If the first part of the repository doesn’t exactly match your username, it won’t work, so make sure to get it right.</p>
-</blockquote>
-<p>官方教程主要强调命名项目的格式,即一定要命名为 username.github.io<br>同时,建完项目之后不要进行任何操作.我们可以直接用hexo初始化项目.</p>
-<h2 id="安装配置hexo">安装配置hexo</h2><p>这一步强烈推荐看<a href="http://hexo.io/zh-cn/docs/index.html" target="_blank" rel="external">Hexo 官方文档</a>,现在很多网上的安装过程是过时的,现在hexo是3.0了.<br>请耐心的看完官方文档以下内容</p>
-<img src="/2015/06/17/用hexo搭建github博客/00.png" alt="[官方文档目录]" title="[官方文档目录]">
-<p>由于hexo3.0很多功能都插件化了,包括git上传,server功能.<br>所以我们要把博客上传到github就需要先装git插件,详细见<a href="http://hexo.io/zh-cn/docs/deployment.html" target="_blank" rel="external">部署</a>(切记要根据文档配置config.yml)<br>以下是常用插件</p>
-<pre><code>npm <span class="operator"><span class="keyword">install</span> hexo-generator-<span class="keyword">index</span> <span class="comment">--save</span>
-npm <span class="keyword">install</span> hexo-generator-archive <span class="comment">--save</span>
-npm <span class="keyword">install</span> hexo-generator-category <span class="comment">--save</span>
-npm <span class="keyword">install</span> hexo-generator-tag <span class="comment">--save</span>
-npm <span class="keyword">install</span> hexo-<span class="keyword">server</span> <span class="comment">--save</span>
-npm <span class="keyword">install</span> hexo-deployer-git <span class="comment">--save</span>
-npm <span class="keyword">install</span> hexo-renderer-marked@<span class="number">0.2</span> <span class="comment">--save</span>
-npm <span class="keyword">install</span> hexo-renderer-stylus@<span class="number">0.2</span> <span class="comment">--save</span>
-npm <span class="keyword">install</span> hexo-generator-feed@<span class="number">1</span> <span class="comment">--save</span>
-npm <span class="keyword">install</span> hexo-generator-sitemap@<span class="number">1</span> <span class="comment">--save</span></span>
-</code></pre><p>在命令行执行即可</p>
-<h2 id="用hexo写作github博客的流程">用hexo写作github博客的流程</h2><p><strong>注意:hexo是用markdown来写作的,以下命令都是博客所在目录执行</strong></p>
-<ol>
-<li>hexo new “title” <ul>
-<li>新建一篇文章,然后编辑相应的md文件</li>
-<li>具体使用查看<a href="http://hexo.io/zh-cn/docs/writing.html" target="_blank" rel="external">写作</a></li>
-</ul>
-</li>
-<li>hexo clean <ul>
-<li>清除缓存</li>
-</ul>
-</li>
-<li>hexo generate<ul>
-<li>根据写作的内容和配置生成网页</li>
-<li>生成文章在public文件夹中,上传到github的就是里面的内容</li>
-<li>具体使用查看<a href="http://hexo.io/zh-cn/docs/generating.html" target="_blank" rel="external">生成器</a></li>
-</ul>
-</li>
-<li>hexo deploy <ul>
-<li>上传到github</li>
-<li>具体使用查看<a href="http://hexo.io/zh-cn/docs/deployment.html" target="_blank" rel="external">部署</a></li>
-</ul>
-</li>
-<li>访问username.github.io查看内容</li>
-</ol>
-<h2 id="hexo与github的关系">hexo与github的关系</h2><p>hexo是一个博客框架,给我们提供了基于markdown的语法,帮助我们自动生成博客.</p>
-<p>由于github提供了github page的功能,那么我们可以把生成的博客网页放在github上,供大家访问.</p>
-<p>也就是说github就像是一个网站空间,由于hexo自带对github的支持,可以直接commit内容到github上,也就是说我们可以把hexo当做集成了写作和ftp发布功能的软件.</p>
-<h2 id="hexo的主题">hexo的主题</h2><p>hexo有丰富的主题支持,本博客用的就是<a href="http://wuchong.me/jacman/2014/11/20/how-to-use-jacman/" target="_blank" rel="external">jacman</a></p>
-<p>更多主题查看<a href="http://hexo.io/themes/" target="_blank" rel="external">主题</a></p>
-<h1 id="总结">总结</h1><p>整个部署流程如下</p>
-<ul>
-<li>注册github</li>
-<li>创建 username.github.io</li>
-<li>安装配置hexo</li>
-<li>开始写作</li>
-<li>额外配置主题</li>
-</ul>
-<p>总的来说,刚开始配置就是一直在折腾,需要有足够的耐心,可能大家都喜欢看别人一步步的详细的步骤,自己只要复制粘贴就行了.但是有时候即使你完全照着做也会出问题的,因为版本和环境不一样.</p>
-<p>一开始我也是这样,后来才发现,最好的方法是查看别人做的思路,然后去找官方的文档.这样遇到的问题会大大减少,有时候你纠结半天的问题可能只是版本不一样.就像前面deploy部署,所有文章都是没有提到要先装</p>
-<pre><code>npm <span class="operator"><span class="keyword">install</span> hexo-deployer-git <span class="comment">--save</span></span>
-</code></pre><p>因为hexo3.0把它插件化了,然后我在官方文档找到了答案.<br><strong>最后提示一下：如果运行命令出现什么问题，加上sudo试试看看，里面有些需要root权限(例如说<code>sudo hexo server</code>)</strong></p>
-<p>仅以此文记录折腾hexo的过程,并且希望给后来者有参考价值.</p>
-<p>最后推荐一篇极其详细的使用hexo的文章<a href="http://ibruce.info/2013/11/22/hexo-your-blog/" target="_blank" rel="external">hexo你的博客</a><br><em>里面的搭建流程是hexo2.0的,最好参考官方文档3.0的方法</em></p>
-<h1 id="补充">补充</h1><h2 id="关于草稿的使用方法">关于草稿的使用方法</h2><p>官方文档关于草稿的使用没有说的很清楚,我根据自己的使用情况作一些介绍.</p>
-<ul>
-<li>创建草稿<br>  <code>hexo new draft &quot;title&quot;</code><br>  在source/_drafts中会创建一份md文件.作为草稿.</li>
-<li>预览草稿<br>  这一步文档中只是要加<code>--draft</code>,没有详细说在哪里加这个选项.根据我的实验,需要在两个命令中添加<code>--draft</code><br>  <code>hexo generate --draft</code>在生成时同时生成草稿<br>  <code>hexo server --draft</code>在本地预览时显示草稿</li>
-<li>发布草稿<br>  <code>hexo publish draft &quot;title&quot;</code>把草稿从_draft中移动到_post</li>
-</ul>
-]]></content>
-    <summary type="html">
-    <![CDATA[<h1 id="背景">背景</h1><p><strong>搭建环境:Linux,nodejs,npm,git</strong></p>
-<p>现在网上已经有很多关于搭建hexo github博客的文章,我自己也是参考别人的文章过来的,但是现在hexo已经到了3.0版本,很多教程]]>
-    </summary>
-    
-      <category term="github" scheme="https://github.com/x-hansong/tags/github/"/>
-    
-      <category term="hexo" scheme="https://github.com/x-hansong/tags/hexo/"/>
-    
-      <category term="Hexo" scheme="https://github.com/x-hansong/categories/Hexo/"/>
-    
-  </entry>
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m XiaoHanSong, a student majoring in SE. <br/>
+			This is my blog for sharing my ideas.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		<a href="https://github.com/https://github.com/x-hansong" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<a href="mailto:x.hansong.scut@gmail.com" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2015 
+		
+		<a href="/about" target="_blank" title="Yonah-潇">Yonah-潇</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
   
-</feed>
+        getSize();
+        if (myWidth >= 1024) {
+          c.click();
+        }
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#nothing"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"yonah"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fe3d10060c65a55e2812e507319e77159' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

@@ -1,0 +1,604 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+<meta name="google-site-verification" content="6wlbKgFEjRhJyXF4xjxEpA_IpuycvAMznqNQvAZ0OCY" />
+<meta name="baidu-site-verification" content="28u1lswj4v" />
+  <meta charset="UTF-8">
+  
+    <title>spice源码分析之server(1) | ShareHub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Yonah-潇">
+    
+
+    
+    <meta name="description" content="前言:本文是结合我自己阅读代码的心得总结而来,同时会忽略很多细节,只能作为阅读源码时的参考.如有错误,欢迎指正.
+Spice简介
+Spice是一个开源的云计算解决方案，使客户端能显示远程虚拟主机的操作界面并且使用其设备，如键盘，鼠标，声音等。Spice给用户提供了一种如同操作本地机器一样的体验，同时尽可能把密集的CPU和GPU任务在客户端上执行。Spice能在局域网和互联网间使用，而不减少用户体验">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spice源码分析之server(1)">
+<meta property="og:url" content="https://github.com/x-hansong/2015/08/19/spice源码分析之server-1/index.html">
+<meta property="og:site_name" content="ShareHub">
+<meta property="og:description" content="前言:本文是结合我自己阅读代码的心得总结而来,同时会忽略很多细节,只能作为阅读源码时的参考.如有错误,欢迎指正.
+Spice简介
+Spice是一个开源的云计算解决方案，使客户端能显示远程虚拟主机的操作界面并且使用其设备，如键盘，鼠标，声音等。Spice给用户提供了一种如同操作本地机器一样的体验，同时尽可能把密集的CPU和GPU任务在客户端上执行。Spice能在局域网和互联网间使用，而不减少用户体验">
+<meta property="og:image" content="https://github.com/x-hansong/2015/08/19/spice源码分析之server-1/01.png">
+<meta property="og:image" content="https://github.com/x-hansong/2015/08/19/spice源码分析之server-1/00.png">
+<meta property="og:image" content="https://github.com/x-hansong/2015/08/19/spice源码分析之server-1/02.png">
+<meta property="og:updated_time" content="2015-08-20T07:39:53.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="spice源码分析之server(1)">
+<meta name="twitter:description" content="前言:本文是结合我自己阅读代码的心得总结而来,同时会忽略很多细节,只能作为阅读源码时的参考.如有错误,欢迎指正.
+Spice简介
+Spice是一个开源的云计算解决方案，使客户端能显示远程虚拟主机的操作界面并且使用其设备，如键盘，鼠标，声音等。Spice给用户提供了一种如同操作本地机器一样的体验，同时尽可能把密集的CPU和GPU任务在客户端上执行。Spice能在局域网和互联网间使用，而不减少用户体验">
+
+    
+    <link rel="alternative" href="/atom.xml" title="ShareHub" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="ShareHub" title="ShareHub"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="ShareHub">ShareHub</a></h1>
+				<h2 class="blog-motto">悲观的意志,乐观的头脑</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">主页|Home</a></li>
+					
+						<li><a href="/archives">归档|Archives</a></li>
+					
+						<li><a href="/about">关于|About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:github.com/x-hansong">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/08/19/spice源码分析之server-1/" title="spice源码分析之server(1)" itemprop="url">spice源码分析之server(1)</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Yonah-潇" target="_blank" itemprop="author">Yonah-潇</a>
+		
+  <p class="article-time">
+    <time datetime="2015-08-19T07:36:41.000Z" itemprop="datePublished"> 发表于 2015-08-19</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Spice简介"><span class="toc-number">1.</span> <span class="toc-text">Spice简介</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Spice_server"><span class="toc-number">2.</span> <span class="toc-text">Spice server</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#部分宏定义"><span class="toc-number">2.1.</span> <span class="toc-text">部分宏定义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#公共函数"><span class="toc-number">2.2.</span> <span class="toc-text">公共函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#VDI接口"><span class="toc-number">2.3.</span> <span class="toc-text">VDI接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Channel"><span class="toc-number">2.4.</span> <span class="toc-text">Channel</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Dispatcher"><span class="toc-number">2.5.</span> <span class="toc-text">Dispatcher</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RedWorker"><span class="toc-number">2.6.</span> <span class="toc-text">RedWorker</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#总结"><span class="toc-number">3.</span> <span class="toc-text">总结</span></a></li></ol>
+		
+		</div>
+		
+		<p><em>前言:本文是结合我自己阅读代码的心得总结而来,同时会忽略很多细节,只能作为阅读源码时的参考.如有错误,欢迎指正.</em></p>
+<h1 id="Spice简介">Spice简介</h1><blockquote>
+<p>Spice是一个开源的云计算解决方案，使客户端能显示远程虚拟主机的操作界面并且使用其设备，如键盘，鼠标，声音等。Spice给用户提供了一种如同操作本地机器一样的体验，同时尽可能把密集的CPU和GPU任务在客户端上执行。Spice能在局域网和互联网间使用，而不减少用户体验。<br><img src="/2015/08/19/spice源码分析之server-1/01.png" alt="[图0]" title="[图0]"></p>
+</blockquote>
+<p>Spice的基本组成包括:</p>
+<ul>
+<li>Spice协议</li>
+<li>Spice服务器</li>
+<li>Spice客户端</li>
+</ul>
+<p>Spice的相关组件包括:</p>
+<ul>
+<li>QXL设备</li>
+<li>QXL驱动</li>
+</ul>
+<p>其中,Spice服务器基于libspice（一个虚拟设备接口可插拔库）。VDI提供了一个通过软件组件来发布虚拟设备接口的标准方式，使得软件组件能够与虚拟设备交互。</p>
+<ul>
+<li>服务器使用Spice协议与客户端交互。</li>
+<li>服务器通过VDI接口与VDI主机程序（如QEMU）交互。</li>
+</ul>
+<p>也就是说spice服务器处于主机与客户端中间,是整个Spice的核心所在.下面我们开始从代码层面分析spice服务器<br>更多资料查看本人翻译的spice新手文档<a href="https://www.gitbook.com/book/xhansong/spice-guidebook" target="_blank" rel="external">Spice入门</a>,以及<a href="http://www.spice-space.org/" target="_blank" rel="external">官方网站</a></p>
+<h1 id="Spice_server">Spice server</h1><img src="/2015/08/19/spice源码分析之server-1/00.png" alt="[图1]" title="[图1]">
+<p>图1是spice服务器的核心架构,贯穿整个源码的组织结构.<br>值得一提的是,spice server是作为一个库提供给qemu使用的,编译出来就是libspice,所以代码中没有main函数.<br>下面我们先了解一个server源码中使用到的一些核心概念,在看源码之前推荐大家先看一遍<a href="https://www.gitbook.com/book/xhansong/spice-guidebook" target="_blank" rel="external">Spice入门</a>,否则理解代码中的某些核心概念会很吃力.</p>
+<h2 id="部分宏定义">部分宏定义</h2><ul>
+<li><strong>SPICE_GNUC_DEPRECATED</strong>,其定义是<code>#define SPICE_GNUC_DEPRECATED  __attribute__((__deprecated__))</code>表示该函数以及被弃用,在编译时会给出警告</li>
+<li><strong>SPICE_GNUC_VISIBLE</strong>,其定义是<code>#define SPICE_GNUC_VISIBLE __attribute__ ((visibility (&quot;default&quot;)))</code>用于控制符号的可见性,设置为对外可见.spice作为动态链接库给qemu使用,默认隐藏函数对外部的可见性,即外部文件不能调用库里面的函数,有这个声明的函数可以被外部文件调用,即为公共函数.</li>
+</ul>
+<h2 id="公共函数">公共函数</h2><p>Server的公共函数主要在两个头文件中:</p>
+<ul>
+<li><strong>spice.h</strong>:与SpiceServer结构体相关的函数,是qemu调用spice的主要函数</li>
+<li><strong>red_dispatcher.h</strong>:与QXL设备相关的函数</li>
+</ul>
+<p>对server的分析,主要围绕这三个公共函数:</p>
+<ul>
+<li><strong>spice_server_init</strong>:负责初始化spice_server</li>
+<li><strong>spice_server_add_interface</strong>:给server注册VDI接口</li>
+<li><strong>spice_server_add_client</strong>:处理qemu接收到的客户端连接消息</li>
+</ul>
+<h2 id="VDI接口">VDI接口</h2><p>从图1中可以看到,VDI接口是spice server离qemu最近的一层,qemu主要是通过VDI接口来与spice交互的.<br>VDI接口的定义在spice.h中,结构体内部的函数指针实现都在qemu的源码里面(ui/spice-core.c)</p>
+<ul>
+<li><p><strong>SpiceCoreInterface</strong>:核心接口,用于创建,添加,取消定时和监听事件</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">SpiceTimer *<span class="list">(<span class="keyword">*timer_add</span>)</span><span class="list">(<span class="keyword">SpiceTimerFunc</span> func, void <span class="variable">*opaque);</span><br><span class="line">void (*</span>timer_start)</span><span class="list">(<span class="keyword">SpiceTimer</span> <span class="variable">*timer, uint32_t ms);</span><br><span class="line">void (*</span>timer_cancel)</span><span class="list">(<span class="keyword">SpiceTimer</span> <span class="variable">*timer);</span><br><span class="line">void (*</span>timer_remove)</span><span class="list">(<span class="keyword">SpiceTimer</span> <span class="variable">*timer);</span><br><span class="line">SpiceWatch *</span><span class="list">(<span class="keyword">*watch_add</span>)</span><span class="list">(<span class="keyword">int</span> fd, int event_mask, SpiceWatchFunc func, void <span class="variable">*opaque);</span><br><span class="line">void (*</span>watch_update_mask)</span><span class="list">(<span class="keyword">SpiceWatch</span> <span class="variable">*watch, int event_mask);</span><br><span class="line">void (*</span>watch_remove)</span><span class="list">(<span class="keyword">SpiceWatch</span> <span class="variable">*watch);</span><br><span class="line">void (*</span>channel_event)</span><span class="list">(<span class="keyword">int</span> event, SpiceChannelEventInfo <span class="variable">*info);</span></span></span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>QXLInterface</strong>:QXL设备接口</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">void <span class="list">(<span class="keyword">*attache_worker</span>)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin, QXLWorker *</span>qxl_worker)</span><span class="comment">;</span></span><br><span class="line">void <span class="list">(<span class="keyword">*set_compression_level</span>)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin, int level);</span><br><span class="line">void (*</span>set_mm_time)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin, uint32_t mm_time);</span><br><span class="line">void (*</span>get_init_info)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin, QXLDevInitInfo *</span>info)</span><span class="comment">;</span></span><br><span class="line">int <span class="list">(<span class="keyword">*get_command</span>)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin, struct QXLCommandExt *</span>cmd)</span><span class="comment">;</span></span><br><span class="line">int <span class="list">(<span class="keyword">*req_cmd_notification</span>)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin);</span><br><span class="line">void (*</span>release_resource)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin, struct QXLReleaseInfoExt release_info);</span><br><span class="line">int (*</span>get_cursor_command)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin, struct QXLCommandExt *</span>cmd)</span><span class="comment">;</span></span><br><span class="line">int <span class="list">(<span class="keyword">*req_cursor_notification</span>)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin);</span><br><span class="line">void (*</span>notify_update)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin, uint32_t update_id);</span><br><span class="line">int (*</span>flush_resources)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin);</span><br><span class="line">void (*</span>async_complete)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin, uint64_t cookie);</span><br><span class="line">void (*</span>update_area_complete)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin, uint32_t surface_id,struct QXLRect *</span>updated_rects,uint32_t num_updated_rects)</span><span class="comment">;</span></span><br><span class="line">void <span class="list">(<span class="keyword">*set_client_capabilities</span>)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin,uint8_t client_present,uint8_t caps[58]);</span><br><span class="line">/*</span> returns <span class="number">1</span> if the interface is supported, <span class="number">0</span> otherwise.</span><br><span class="line"> <span class="variable">* if monitors_config is NULL nothing is done except reporting the</span><br><span class="line"> *</span> return code. <span class="variable">*/</span><br><span class="line">int (*</span>client_monitors_config)</span><span class="list">(<span class="keyword">QXLInstance</span> <span class="variable">*qin,VDAgentMonitorsConfig *</span>monitors_config)</span><span class="comment">;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>SpiceCharDeviceInterface</strong>:字符型设备接口</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">void <span class="list">(<span class="keyword">*state</span>)</span><span class="list">(<span class="keyword">SpiceCharDeviceInstance</span> <span class="variable">*sin, int connected);</span><br><span class="line">int (*</span>write)</span><span class="list">(<span class="keyword">SpiceCharDeviceInstance</span> <span class="variable">*sin, const uint8_t *</span>buf, int len)</span><span class="comment">;</span></span><br><span class="line">int <span class="list">(<span class="keyword">*read</span>)</span><span class="list">(<span class="keyword">SpiceCharDeviceInstance</span> <span class="variable">*sin, uint8_t *</span>buf, int len)</span><span class="comment">;</span></span><br><span class="line">void <span class="list">(<span class="keyword">*event</span>)</span><span class="list">(<span class="keyword">SpiceCharDeviceInstance</span> <span class="variable">*sin, uint8_t event);</span></span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>SpiceKbdInterface</strong>:键盘接口</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">void <span class="list">(<span class="keyword">*push_scan_freg</span>)</span><span class="list">(<span class="keyword">SpiceKbdInstance</span> <span class="variable">*sin, uint8_t frag);</span><br><span class="line">uint8_t (*</span>get_leds)</span><span class="list">(<span class="keyword">SpiceKbdInstance</span> <span class="variable">*sin);</span></span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>SpiceMigrateInterface</strong>:迁移接口</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">void <span class="list">(<span class="keyword">*migrate_connect_complete</span>)</span><span class="list">(<span class="keyword">SpiceMigrateInstance</span> <span class="variable">*sin);</span><br><span class="line">void (*</span>migrate_end_complete)</span><span class="list">(<span class="keyword">SpiceMigrateInstance</span> <span class="variable">*sin);</span></span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>SpiceMouseInterface</strong>:鼠标接口</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> (*motion)(SpiceMouseInstance *<span class="built_in">sin</span>, <span class="keyword">int</span> dx, <span class="keyword">int</span> dy, <span class="keyword">int</span> dz,<span class="keyword">uint32_t</span> buttons_state);</span><br><span class="line"><span class="keyword">void</span> (*buttons)(SpiceMouseInstance *<span class="built_in">sin</span>, <span class="keyword">uint32_t</span> buttons_state);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>SpiceTabletInterface</strong>:触摸板接口</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">void <span class="list">(<span class="keyword">*set_logical_size</span>)</span><span class="list">(<span class="keyword">SpiceTabletInstance*</span> tablet, int width, int height)</span><span class="comment">;</span></span><br><span class="line">void <span class="list">(<span class="keyword">*position</span>)</span><span class="list">(<span class="keyword">SpiceTabletInstance*</span> tablet, int x, int y, uint32_t buttons_state)</span><span class="comment">;</span></span><br><span class="line">void <span class="list">(<span class="keyword">*wheel</span>)</span><span class="list">(<span class="keyword">SpiceTabletInstance*</span> tablet, int wheel_moution, uint32_t buttons_state)</span><span class="comment">;</span></span><br><span class="line">void <span class="list">(<span class="keyword">*buttons</span>)</span><span class="list">(<span class="keyword">SpiceTabletInstance*</span> tablet, uint32_t buttons_state)</span><span class="comment">;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>SpicePlaybackInterface</strong>:声音接口</p>
+</li>
+<li><strong>SpiceRecordInterface</strong>:录音接口</li>
+</ul>
+<h2 id="Channel">Channel</h2><p>从图1可以看到,VDI接口之后即是Channel(QXLInterface比较特殊,这个后面再说).<br>Channel的主要作用是使用对应的TCP连接传输消息给客户端,保证其传输的可靠性,其本质是通道,不同的Channel传输不同的消息.</p>
+<p>spice中主要有六种Channel:</p>
+<ul>
+<li><strong>MainChannel</strong>:与客户端连接的建立和断开有关</li>
+<li><strong>InputsChannel</strong>:跟鼠标,键盘,触摸板的输入有关</li>
+<li><strong>DisplayChannel</strong>:跟图像传输有关</li>
+<li><strong>CursorChannel</strong>:跟鼠标指针的显示有关</li>
+<li><strong>PlaybackChannel</strong>:跟播放宿机的声音有关</li>
+<li><strong>RecordChannel</strong>:跟录制客户端的声音有关</li>
+</ul>
+<p>这六种Channel并不是平行的关系,虽然都继承与RedChannel,但是在实现以及逻辑上的作用有很大不同,大致可以分成三类.</p>
+<ul>
+<li>Main和Input通道被相应的处理函数控制(reds.c)</li>
+<li>Display和Cursor通道被每个display工作线程使用(red_worker.c)</li>
+<li>Playback和Record通道有它们各自的处理程序(snd_worker.c)</li>
+</ul>
+<p>六种Channel中只有DisplayChannel和CursorChannel是单独在工作线程工作的,其他都是在qemu线程工作.</p>
+<h2 id="Dispatcher">Dispatcher</h2><img src="/2015/08/19/spice源码分析之server-1/02.png" alt="[图3]" title="[图3]">
+<p>前面提到Channel负责传输消息,而Dispatcher则负责处理消息,并且调度Channel.<br>Dispatcher使用socketpair来与外界交互,例如监听事件,传输结果等.<br>这里存在两种Dispatcher</p>
+<ul>
+<li><strong>MainDispatcher</strong>:在qemu线程中监听socket事件,处理客户端连接的初始化,建立和断开等,跟MainChannel相关</li>
+<li><strong>RedDispatcher</strong>:在worker线程中监听socket事件,处理QXL设备有关的消息,跟DisplayChannel,CursorChannel相关,图3描述的就是RedDispatcher的工作流程.在图1我们看到QXLInterface与其他接口不一样,与Channel的联系中间多了一个RedDispatcher,它们在单独的Worker线程中工作,提供了QEMU与接收的图像命令处理和渲染过程的独立性</li>
+</ul>
+<h2 id="RedWorker">RedWorker</h2><p>RedWorker可以说是server的核心,80%代码跟它有关,毕竟它负责图像渲染和传输,这是spice最难最复杂的部分,涉及图像的压缩,渲染,局部刷新等核心技术.<br>RedWorker在单独线程上工作,通过QXLInterface与QEMU的QXL设备直接交互,同时控制DisplayChannel,CursorChannel,并且拥有自己的poll事件驱动核心.而其他的Channel都依赖于QEMU线程.</p>
+<h1 id="总结">总结</h1><ul>
+<li>Spice server作为一个库给QEMU调用,用于支持Spice协议.</li>
+<li>server通过使用VDI接口与QEMU交互</li>
+<li>server通过使用Channel与客户端交互</li>
+<li>Dispatcher用于处理消息</li>
+<li>Channel用于传输消息</li>
+<li>图像在RedWorker线程中处理</li>
+</ul>
+<p>以上是我分析的server源代码的核心概念,为了方便理解,描述并不全面.其中关于迁移,声音,录音等功能并没有看过,我主要关注server的工作原理,在了解它工作流程之后,就好比有了一张地图,剩下的就是一个个去探险了.<br>当然了,没有代码的分析就是耍流氓.这篇就当是开胃菜,之后,我会结合代码,分析server的启动流程以及工作流程.先挖个坑.</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/虚拟化/">虚拟化</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/spice/">spice</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="https://github.com/x-hansong/2015/08/19/spice源码分析之server-1/" data-title="spice源码分析之server(1) | ShareHub" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2015/07/29/spice源码分析之server/"  title="spice源码分析之server">
+ <strong>下一篇：</strong><br/> 
+ <span>spice源码分析之server
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comments" class="comment">
+	<div class="ds-thread" data-thread-key="2015/08/19/spice源码分析之server-1/" data-title="spice源码分析之server(1)" data-url="https://github.com/x-hansong/2015/08/19/spice源码分析之server-1/"></div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Spice简介"><span class="toc-number">1.</span> <span class="toc-text">Spice简介</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Spice_server"><span class="toc-number">2.</span> <span class="toc-text">Spice server</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#部分宏定义"><span class="toc-number">2.1.</span> <span class="toc-text">部分宏定义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#公共函数"><span class="toc-number">2.2.</span> <span class="toc-text">公共函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#VDI接口"><span class="toc-number">2.3.</span> <span class="toc-text">VDI接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Channel"><span class="toc-number">2.4.</span> <span class="toc-text">Channel</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Dispatcher"><span class="toc-number">2.5.</span> <span class="toc-text">Dispatcher</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RedWorker"><span class="toc-number">2.6.</span> <span class="toc-text">RedWorker</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#总结"><span class="toc-number">3.</span> <span class="toc-text">总结</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/Hexo/" title="Hexo">Hexo<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/spice源码分析/" title="spice源码分析">spice源码分析<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/理解链接/" title="理解链接">理解链接<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/算法学习/" title="算法学习">算法学习<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/虚拟化/" title="虚拟化">虚拟化<sup>2</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/算法/" title="算法">算法<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/spice/" title="spice">spice<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/链接/" title="链接">链接<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/暴力求解/" title="暴力求解">暴力求解<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/分治法/" title="分治法">分治法<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/减治法/" title="减治法">减治法<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/hexo/" title="hexo">hexo<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/github/" title="github">github<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/虚拟化/" title="虚拟化">虚拟化<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m XiaoHanSong, a student majoring in SE. <br/>
+			This is my blog for sharing my ideas.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		<a href="https://github.com/https://github.com/x-hansong" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<a href="mailto:x.hansong.scut@gmail.com" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2015 
+		
+		<a href="/about" target="_blank" title="Yonah-潇">Yonah-潇</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+        getSize();
+        if (myWidth >= 1024) {
+          c.click();
+        }
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#nothing"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"yonah"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fe3d10060c65a55e2812e507319e77159' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>
