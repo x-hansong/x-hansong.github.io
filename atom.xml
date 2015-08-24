@@ -5,7 +5,7 @@
   <subtitle><![CDATA[悲观的意志,乐观的头脑]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="https://github.com/x-hansong//"/>
-  <updated>2015-08-20T07:39:53.000Z</updated>
+  <updated>2015-08-24T06:54:06.000Z</updated>
   <id>https://github.com/x-hansong//</id>
   
   <author>
@@ -16,13 +16,88 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title><![CDATA[Linux源代码分析工具链]]></title>
+    <link href="https://github.com/x-hansong/2015/08/24/Linux%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7%E9%93%BE/"/>
+    <id>https://github.com/x-hansong/2015/08/24/Linux源码分析工具链/</id>
+    <published>2015-08-24T02:02:11.000Z</published>
+    <updated>2015-08-24T06:54:06.000Z</updated>
+    <content type="html"><![CDATA[<h2 id="前言">前言</h2><p>看源代码是一个程序员必须经历的事情,也是可以提升能力的一个捷径.个人认为: <strong>要完全掌握一个软件的方法只有阅读源码</strong><br>在Windows下有sourceinsight这个源码阅读软件(虽然我没用过,但是网上评价还不错),由于我是个Linuxer,并不喜欢用Windows,所以自然是选择在Linux下阅读源码的工具了.<br>下面我将逐一介绍在Linux下阅读源码的工具.</p>
+<h2 id="vim+ctags+cscope">vim+ctags+cscope</h2><p>源码阅读三剑客.vim配合ctags和cscope,足以在源代码里面自由翱翔,在函数和变量间自由跳转.</p>
+<h3 id="安装">安装</h3><figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-<span class="built_in">get</span> install <span class="keyword">vim</span> ctags <span class="keyword">cscope</span></span><br></pre></td></tr></table></figure>
+<h3 id="使用">使用</h3><h4 id="vim">vim</h4><p>vim的使用就略过了,网上资料很多,不是一篇文章能说完的,未来我可能会写一篇vim的使用心得<br>推荐一篇<a href="http://coolshell.cn/articles/5426.html" target="_blank" rel="external">简明 Vim 练级攻略</a>,看完就差不多会用了.</p>
+<h4 id="ctags">ctags</h4><p>ctags的使用很简单,vim已经内置了对ctags的支持<br>首先在源代码根目录执行<code>ctags -R</code>,递归的为源码建立tags,在根目录会生成一个Tags的文件,存放各种函数和变量的tag,便于跳转</p>
+<ul>
+<li>使光标在函数或变量上,<code>Ctrl + ]</code>即可跳转到其定义处</li>
+<li><code>Ctrl + t</code>可以回到你跳转之前的位置</li>
+</ul>
+<p>对于简单的代码,ctags就够用了,但是对于比较复杂的代码来说,ctags显得有点力不从心,于是,下一位剑客就登场了.</p>
+<h4 id="cscope">cscope</h4><p>vim同样内置了对cscope的支持.<br>首先在源代码根目录执行<code>cscope -Rbq</code>,就会生成cscope.out文件(索引数据库)</p>
+<ul>
+<li>-R: 在生成索引文件时，搜索子目录树中的代码</li>
+<li>-b: 只生成索引文件，不进入cscope的界面</li>
+<li>-q: 生成cscope.in.out和cscope.po.out文件，加快cscope的索引速度</li>
+</ul>
+<p>然后在vim中执行<code>:cs add cscope.out</code>,添加数据库.<br>接下来就可以使用<code>:cs find x var</code>进行查找.(x代表查询选项,var表示要查找的函数或变量名)<br>cscope支持8种查询方式</p>
+<ul>
+<li>s: 查找C语言符号，即查找函数名、宏、枚举值等出现的地方</li>
+<li>g: 查找函数、宏、枚举等定义的位置，类似ctags所提供的功能</li>
+<li>d: 查找本函数调用的函数</li>
+<li>c: 查找调用本函数的函数</li>
+<li>t: 查找指定的字符串</li>
+<li>e: 查找egrep模式，相当于egrep功能，但查找速度快多了</li>
+<li>f: 查找并打开文件，类似vim的find功能</li>
+<li>i: 查找包含本文件的文件</li>
+</ul>
+<p>例如，我们想在vim 7.0的源代码中查找调用do_cscope()函数的函数，我们可以输入：”:cs find c do_cscope“，回车后发现没有找到匹配的功能，可能并没有函数调用do_cscope()。我们再输入”:cs find s do_cscope“，查找这个C符号出现的位置，现在vim列出了这个符号出现的所有位置。</p>
+<p>每次都有输入<code>cs find</code>来查找数据是不是有点麻烦,有没有更方便的方法呢.当然有,vim的神奇之处在其可定制性.提供一份cscope的配置,将其放在.vimrc中即可.<br><figure class="highlight ceylon"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">"""</span><br><span class="line">" cscope setting</span><br><span class="line">"""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span></span><br><span class="line"><span class="keyword">if</span> has(<span class="string">"cscope"</span>)</span><br><span class="line">  set csprg=/usr/bin/cscope</span><br><span class="line">  set csto=<span class="number">1</span></span><br><span class="line">  set cst</span><br><span class="line">  set nocsverb</span><br><span class="line">  <span class="string">" add any database in current directory</span><br><span class="line">  if filereadable("</span>cscope.<span class="keyword">out</span><span class="string">")</span><br><span class="line">      cs add cscope.out</span><br><span class="line">  endif</span><br><span class="line">  set csverb</span><br><span class="line">endif</span><br><span class="line"></span><br><span class="line">nmap &lt;C-@&gt;s :cs find s &lt;C-R&gt;=expand("</span>&lt;cword&gt;<span class="string">")&lt;CR&gt;&lt;CR&gt;</span><br><span class="line">nmap &lt;C-@&gt;g :cs find g &lt;C-R&gt;=expand("</span>&lt;cword&gt;<span class="string">")&lt;CR&gt;&lt;CR&gt;</span><br><span class="line">nmap &lt;C-@&gt;c :cs find c &lt;C-R&gt;=expand("</span>&lt;cword&gt;<span class="string">")&lt;CR&gt;&lt;CR&gt;</span><br><span class="line">nmap &lt;C-@&gt;t :cs find t &lt;C-R&gt;=expand("</span>&lt;cword&gt;<span class="string">")&lt;CR&gt;&lt;CR&gt;</span><br><span class="line">nmap &lt;C-@&gt;e :cs find e &lt;C-R&gt;=expand("</span>&lt;cword&gt;<span class="string">")&lt;CR&gt;&lt;CR&gt;</span><br><span class="line">nmap &lt;C-@&gt;f :cs find f &lt;C-R&gt;=expand("</span>&lt;cfile&gt;<span class="string">")&lt;CR&gt;&lt;CR&gt;</span><br><span class="line">nmap &lt;C-@&gt;i :cs find i ^&lt;C-R&gt;=expand("</span>&lt;cfile&gt;<span class="string">")&lt;CR&gt;$&lt;CR&gt;</span><br><span class="line">nmap &lt;C-@&gt;d :cs find d &lt;C-R&gt;=expand("</span>&lt;cword&gt;<span class="string">")&lt;CR&gt;&lt;CR&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>上面的配置即把<code>Ctrl + @</code>作为<code>:cs find</code>的快捷键,也就是说要查找某个函数名,只需要把光标放在函数名上,按下<code>Ctrl + @ + s</code>即可,简直不能更方便.而且你可以自己修改配置,映射到自己觉得舒服的快捷键上.</p>
+<p>本着不重复造轮子的原则,我就简单的写了cscope的基本用法,其实基本上就够用了,进阶的用法参考这篇文章<a href="http://easwy.com/blog/archives/advanced-vim-skills-cscope/" target="_blank" rel="external">vi/vim使用进阶: 程序员的利器 – cscope</a></p>
+<h2 id="doxygen">doxygen</h2><p>上面我们讲的是用vim来查看源代码,但是面对几十万代码的时候,想要看清楚各个结构体之间的关系就不是vim能够做到的了.这时候我们就需要doxygen来帮手了.</p>
+<blockquote>
+<p>Doxygen is the de facto standard tool for generating documentation from annotated C++ sources, but it also supports other popular programming languages such as C, Objective-C, C#, PHP, Java, Python, IDL (Corba, Microsoft, and UNO/OpenOffice flavors), Fortran, VHDL, Tcl, and to some extent D.</p>
+</blockquote>
+<p>doxygen是一个根据源代码生成文档的工具,这货虽然主要是给C++用的,但是它也对其他语言有支持.<br>安装直接去<a href="http://www.stack.nl/~dimitri/doxygen/index.html" target="_blank" rel="external">官网</a>,按照其指导安装即可<br>下面根据我生成qemu源代码文档的例子,介绍一下doxygen的使用方法.</p>
+<p>首先,在源代码根目录执行<code>doxygen -g</code>,然后在根目录就会突然冒出一个名为Doxyfile的文件,这个文件就是doxygen生成文档的配置文件了.<br>那么,重点来了,怎么配置这个文件,默认的配置是根据代码生成各个结构体的成员数据,然后生成html和latex两个文件夹,分别是网页和latex文档.<br>说实话,默认生成的文档并没有什么卵用,除了让你更方便的看到各个结构体的组成成员.我们关心的是各个结构体之间的关系,这是针对C而言的.对与C++和java而言,关心的是类之间的关系.所以,默认的配置肯定是要修改的.至于怎么改,看<a href="http://www.stack.nl/~dimitri/doxygen/manual/index.html" target="_blank" rel="external">官方文档</a>.</p>
+<p>当然了,如果这篇文章唯一给出的建议就是看文档,那这篇文章有什么意义呢.大家都知道看文档可以解决问题,但是时间成本太高,而且是英文的.写这篇文章的目的是分享自己学习得到的经验,让大家少走弯路,如果不能解决你的问题,只能去看文档了</p>
+<p>接下来我根据我自己看文档用到的配置跟大家解释一下.<br>首先,Doxygen里面的配置可谓又臭又长,你绝对不会有读完它的欲望.所以我给出几个关键的配置项,到时候搜索它修改即可</p>
+<ul>
+<li><p>这是针对各种语言优化输出的选项,默认都是NO,因为它不清楚你用的是什么语言(话说看一下后缀不就知道了吗…)</p>
+  <figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">OPTIMIZE_OUTPUT_FOR_C</span></span><br><span class="line">OPTIMIZE_OUTPUT_JAVA</span><br><span class="line">OPTIMIZE_FOR_FORTRAN</span><br><span class="line">OPTIMIZE_OUTPUT_VHDL</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>这个是生成文档的类型的选项,默认生成html和latex,共支持六种类型的文档,每种类型的生成配置也是很多,具体根据需要配置</p>
+  <figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">GENERATE_HTML</span></span><br><span class="line">GENERATE_LATEX</span><br><span class="line">GENERATE_RTF</span><br><span class="line">GENERATE_XML</span><br><span class="line">GENERATE_DOCBOOK</span><br><span class="line">GENERATE_MAN</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>关于生成图像的选项.doxygen使用dot这个工具来绘图,所以要先执行<code>sudo apt-get install graphviz</code>安装dot.在设置好这个绘图选项之后,doxygen就会生成各个结构体的关系,对于类会生成函数调用关系(我没试过,因为只试过C的).</p>
+  <figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">HAVE_DOT <span class="list">(一定要置为YES,后面的选项都依赖这个)</span></span><br><span class="line">DOT_NUM_THREADS <span class="list">(使用dot绘图的线程数量,越多越快,我一般是设置跟cpu的核数一样)</span></span><br></pre></td></tr></table></figure>
+<p>  给一个结构体关系图,就是doxygen生成的.</p>
+  <img src="/2015/08/24/Linux源码分析工具链/00.png" alt="[machine_class]" title="[machine_class]">
+</li>
+</ul>
+<h2 id="gdb">gdb</h2><p>最后一个工具,大名鼎鼎的gdb.分析源码执行流程的最好方式的是运行它,然后一步步执行.用来观察它最好的工具当然是gdb了(针对C/C++).<br>gdb的使用我也不打算造轮子,直接参考<a href="http://wiki.ubuntu.org.cn/index.php?title=%E7%94%A8GDB%E8%B0%83%E8%AF%95%E7%A8%8B%E5%BA%8F&amp;variant=zh-hans" target="_blank" rel="external">用GDB调试程序</a>,这篇写的很好,通俗易懂.</p>
+<h2 id="后记">后记</h2><p>以上就是我在阅读源码的时候使用的Linux工具,三剑客<strong>vim+ctags+cscope</strong>,两板斧<strong>doxygen gdb</strong>,足以驰骋源代码的江湖.</p>
+<p>以上工具,vim和gdb是最难学的,学习曲线很陡峭.但是学好之后,就能守得云开见月明.</p>
+<p><em>参考文章,感谢帮助</em><br><a href="http://easwy.com/blog/archives/advanced-vim-skills-cscope/" target="_blank" rel="external">vi/vim使用进阶: 程序员的利器 – cscope</a></p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<h2 id="前言">前言</h2><p>看源代码是一个程序员必须经历的事情,也是可以提升能力的一个捷径.个人认为: <strong>要完全掌握一个软件的方法只有阅读源码</strong><br>在Windows下有sourceinsight这个源码阅读软件(虽然我没用过,但是]]>
+    </summary>
+    
+      <category term="Linux" scheme="https://github.com/x-hansong/tags/Linux/"/>
+    
+      <category term="源代码分析" scheme="https://github.com/x-hansong/tags/%E6%BA%90%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90/"/>
+    
+      <category term="Linux工具" scheme="https://github.com/x-hansong/categories/Linux%E5%B7%A5%E5%85%B7/"/>
+    
+  </entry>
+  
+  <entry>
     <title><![CDATA[spice源码分析之server(1)]]></title>
     <link href="https://github.com/x-hansong/2015/08/19/spice%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B9%8Bserver-1/"/>
     <id>https://github.com/x-hansong/2015/08/19/spice源码分析之server-1/</id>
     <published>2015-08-19T07:36:41.000Z</published>
-    <updated>2015-08-20T07:39:53.000Z</updated>
+    <updated>2015-08-21T03:31:17.000Z</updated>
     <content type="html"><![CDATA[<p><em>前言:本文是结合我自己阅读代码的心得总结而来,同时会忽略很多细节,只能作为阅读源码时的参考.如有错误,欢迎指正.</em></p>
-<h1 id="Spice简介">Spice简介</h1><blockquote>
+<h2 id="Spice简介">Spice简介</h2><blockquote>
 <p>Spice是一个开源的云计算解决方案，使客户端能显示远程虚拟主机的操作界面并且使用其设备，如键盘，鼠标，声音等。Spice给用户提供了一种如同操作本地机器一样的体验，同时尽可能把密集的CPU和GPU任务在客户端上执行。Spice能在局域网和互联网间使用，而不减少用户体验。<br><img src="/2015/08/19/spice源码分析之server-1/01.png" alt="[图0]" title="[图0]"></p>
 </blockquote>
 <p>Spice的基本组成包括:</p>
@@ -42,13 +117,13 @@
 <li>服务器通过VDI接口与VDI主机程序（如QEMU）交互。</li>
 </ul>
 <p>也就是说spice服务器处于主机与客户端中间,是整个Spice的核心所在.下面我们开始从代码层面分析spice服务器<br>更多资料查看本人翻译的spice新手文档<a href="https://www.gitbook.com/book/xhansong/spice-guidebook" target="_blank" rel="external">Spice入门</a>,以及<a href="http://www.spice-space.org/" target="_blank" rel="external">官方网站</a></p>
-<h1 id="Spice_server">Spice server</h1><img src="/2015/08/19/spice源码分析之server-1/00.png" alt="[图1]" title="[图1]">
+<h2 id="Spice_server">Spice server</h2><img src="/2015/08/19/spice源码分析之server-1/00.png" alt="[图1]" title="[图1]">
 <p>图1是spice服务器的核心架构,贯穿整个源码的组织结构.<br>值得一提的是,spice server是作为一个库提供给qemu使用的,编译出来就是libspice,所以代码中没有main函数.<br>下面我们先了解一个server源码中使用到的一些核心概念,在看源码之前推荐大家先看一遍<a href="https://www.gitbook.com/book/xhansong/spice-guidebook" target="_blank" rel="external">Spice入门</a>,否则理解代码中的某些核心概念会很吃力.</p>
-<h2 id="部分宏定义">部分宏定义</h2><ul>
+<h3 id="部分宏定义">部分宏定义</h3><ul>
 <li><strong>SPICE_GNUC_DEPRECATED</strong>,其定义是<code>#define SPICE_GNUC_DEPRECATED  __attribute__((__deprecated__))</code>表示该函数以及被弃用,在编译时会给出警告</li>
 <li><strong>SPICE_GNUC_VISIBLE</strong>,其定义是<code>#define SPICE_GNUC_VISIBLE __attribute__ ((visibility (&quot;default&quot;)))</code>用于控制符号的可见性,设置为对外可见.spice作为动态链接库给qemu使用,默认隐藏函数对外部的可见性,即外部文件不能调用库里面的函数,有这个声明的函数可以被外部文件调用,即为公共函数.</li>
 </ul>
-<h2 id="公共函数">公共函数</h2><p>Server的公共函数主要在两个头文件中:</p>
+<h3 id="公共函数">公共函数</h3><p>Server的公共函数主要在两个头文件中:</p>
 <ul>
 <li><strong>spice.h</strong>:与SpiceServer结构体相关的函数,是qemu调用spice的主要函数</li>
 <li><strong>red_dispatcher.h</strong>:与QXL设备相关的函数</li>
@@ -59,7 +134,7 @@
 <li><strong>spice_server_add_interface</strong>:给server注册VDI接口</li>
 <li><strong>spice_server_add_client</strong>:处理qemu接收到的客户端连接消息</li>
 </ul>
-<h2 id="VDI接口">VDI接口</h2><p>从图1中可以看到,VDI接口是spice server离qemu最近的一层,qemu主要是通过VDI接口来与spice交互的.<br>VDI接口的定义在spice.h中,结构体内部的函数指针实现都在qemu的源码里面(ui/spice-core.c)</p>
+<h3 id="VDI接口">VDI接口</h3><p>从图1中可以看到,VDI接口是spice server离qemu最近的一层,qemu主要是通过VDI接口来与spice交互的.<br>VDI接口的定义在spice.h中,结构体内部的函数指针实现都在qemu的源码里面(ui/spice-core.c)</p>
 <ul>
 <li><p><strong>SpiceCoreInterface</strong>:核心接口,用于创建,添加,取消定时和监听事件</p>
 <figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">SpiceTimer *<span class="list">(<span class="keyword">*timer_add</span>)</span><span class="list">(<span class="keyword">SpiceTimerFunc</span> func, void <span class="variable">*opaque);</span><br><span class="line">void (*</span>timer_start)</span><span class="list">(<span class="keyword">SpiceTimer</span> <span class="variable">*timer, uint32_t ms);</span><br><span class="line">void (*</span>timer_cancel)</span><span class="list">(<span class="keyword">SpiceTimer</span> <span class="variable">*timer);</span><br><span class="line">void (*</span>timer_remove)</span><span class="list">(<span class="keyword">SpiceTimer</span> <span class="variable">*timer);</span><br><span class="line">SpiceWatch *</span><span class="list">(<span class="keyword">*watch_add</span>)</span><span class="list">(<span class="keyword">int</span> fd, int event_mask, SpiceWatchFunc func, void <span class="variable">*opaque);</span><br><span class="line">void (*</span>watch_update_mask)</span><span class="list">(<span class="keyword">SpiceWatch</span> <span class="variable">*watch, int event_mask);</span><br><span class="line">void (*</span>watch_remove)</span><span class="list">(<span class="keyword">SpiceWatch</span> <span class="variable">*watch);</span><br><span class="line">void (*</span>channel_event)</span><span class="list">(<span class="keyword">int</span> event, SpiceChannelEventInfo <span class="variable">*info);</span></span></span></span><br></pre></td></tr></table></figure>
@@ -86,7 +161,7 @@
 </li>
 <li><strong>SpiceRecordInterface</strong>:录音接口</li>
 </ul>
-<h2 id="Channel">Channel</h2><p>从图1可以看到,VDI接口之后即是Channel(QXLInterface比较特殊,这个后面再说).<br>Channel的主要作用是使用对应的TCP连接传输消息给客户端,保证其传输的可靠性,其本质是通道,不同的Channel传输不同的消息.</p>
+<h3 id="Channel">Channel</h3><p>从图1可以看到,VDI接口之后即是Channel(QXLInterface比较特殊,这个后面再说).<br>Channel的主要作用是使用对应的TCP连接传输消息给客户端,保证其传输的可靠性,其本质是通道,不同的Channel传输不同的消息.</p>
 <p>spice中主要有六种Channel:</p>
 <ul>
 <li><strong>MainChannel</strong>:与客户端连接的建立和断开有关</li>
@@ -103,14 +178,14 @@
 <li>Playback和Record通道有它们各自的处理程序(snd_worker.c)</li>
 </ul>
 <p>六种Channel中只有DisplayChannel和CursorChannel是单独在工作线程工作的,其他都是在qemu线程工作.</p>
-<h2 id="Dispatcher">Dispatcher</h2><img src="/2015/08/19/spice源码分析之server-1/02.png" alt="[图3]" title="[图3]">
+<h3 id="Dispatcher">Dispatcher</h3><img src="/2015/08/19/spice源码分析之server-1/02.png" alt="[图3]" title="[图3]">
 <p>前面提到Channel负责传输消息,而Dispatcher则负责处理消息,并且调度Channel.<br>Dispatcher使用socketpair来与外界交互,例如监听事件,传输结果等.<br>这里存在两种Dispatcher</p>
 <ul>
 <li><strong>MainDispatcher</strong>:在qemu线程中监听socket事件,处理客户端连接的初始化,建立和断开等,跟MainChannel相关</li>
 <li><strong>RedDispatcher</strong>:在worker线程中监听socket事件,处理QXL设备有关的消息,跟DisplayChannel,CursorChannel相关,图3描述的就是RedDispatcher的工作流程.在图1我们看到QXLInterface与其他接口不一样,与Channel的联系中间多了一个RedDispatcher,它们在单独的Worker线程中工作,提供了QEMU与接收的图像命令处理和渲染过程的独立性</li>
 </ul>
-<h2 id="RedWorker">RedWorker</h2><p>RedWorker可以说是server的核心,80%代码跟它有关,毕竟它负责图像渲染和传输,这是spice最难最复杂的部分,涉及图像的压缩,渲染,局部刷新等核心技术.<br>RedWorker在单独线程上工作,通过QXLInterface与QEMU的QXL设备直接交互,同时控制DisplayChannel,CursorChannel,并且拥有自己的poll事件驱动核心.而其他的Channel都依赖于QEMU线程.</p>
-<h1 id="总结">总结</h1><ul>
+<h3 id="RedWorker">RedWorker</h3><p>RedWorker可以说是server的核心,80%代码跟它有关,毕竟它负责图像渲染和传输,这是spice最难最复杂的部分,涉及图像的压缩,渲染,局部刷新等核心技术.<br>RedWorker在单独线程上工作,通过QXLInterface与QEMU的QXL设备直接交互,同时控制DisplayChannel,CursorChannel,并且拥有自己的poll事件驱动核心.而其他的Channel都依赖于QEMU线程.</p>
+<h2 id="总结">总结</h2><ul>
 <li>Spice server作为一个库给QEMU调用,用于支持Spice协议.</li>
 <li>server通过使用VDI接口与QEMU交互</li>
 <li>server通过使用Channel与客户端交互</li>
@@ -122,7 +197,7 @@
 ]]></content>
     <summary type="html">
     <![CDATA[<p><em>前言:本文是结合我自己阅读代码的心得总结而来,同时会忽略很多细节,只能作为阅读源码时的参考.如有错误,欢迎指正.</em></p>
-<h1 id="Spice简介">Spice简介</h1><blockquote>
+<h2 id="Spice简介">Spice简介</h2><blockquote>
 <p>Spice是一个开源的云计算解决方案，使客户]]>
     </summary>
     

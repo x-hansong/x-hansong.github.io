@@ -26,7 +26,7 @@ Spice是一个开源的云计算解决方案，使客户端能显示远程虚拟
 <meta property="og:image" content="https://github.com/x-hansong/2015/08/19/spice源码分析之server-1/01.png">
 <meta property="og:image" content="https://github.com/x-hansong/2015/08/19/spice源码分析之server-1/00.png">
 <meta property="og:image" content="https://github.com/x-hansong/2015/08/19/spice源码分析之server-1/02.png">
-<meta property="og:updated_time" content="2015-08-20T07:39:53.000Z">
+<meta property="og:updated_time" content="2015-08-21T03:31:17.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="spice源码分析之server(1)">
 <meta name="twitter:description" content="前言:本文是结合我自己阅读代码的心得总结而来,同时会忽略很多细节,只能作为阅读源码时的参考.如有错误,欢迎指正.
@@ -107,12 +107,12 @@ Spice是一个开源的云计算解决方案，使客户端能显示远程虚拟
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Spice简介"><span class="toc-number">1.</span> <span class="toc-text">Spice简介</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Spice_server"><span class="toc-number">2.</span> <span class="toc-text">Spice server</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#部分宏定义"><span class="toc-number">2.1.</span> <span class="toc-text">部分宏定义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#公共函数"><span class="toc-number">2.2.</span> <span class="toc-text">公共函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#VDI接口"><span class="toc-number">2.3.</span> <span class="toc-text">VDI接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Channel"><span class="toc-number">2.4.</span> <span class="toc-text">Channel</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Dispatcher"><span class="toc-number">2.5.</span> <span class="toc-text">Dispatcher</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RedWorker"><span class="toc-number">2.6.</span> <span class="toc-text">RedWorker</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#总结"><span class="toc-number">3.</span> <span class="toc-text">总结</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Spice简介"><span class="toc-number">1.</span> <span class="toc-text">Spice简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Spice_server"><span class="toc-number">2.</span> <span class="toc-text">Spice server</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#部分宏定义"><span class="toc-number">2.1.</span> <span class="toc-text">部分宏定义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#公共函数"><span class="toc-number">2.2.</span> <span class="toc-text">公共函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#VDI接口"><span class="toc-number">2.3.</span> <span class="toc-text">VDI接口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Channel"><span class="toc-number">2.4.</span> <span class="toc-text">Channel</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Dispatcher"><span class="toc-number">2.5.</span> <span class="toc-text">Dispatcher</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RedWorker"><span class="toc-number">2.6.</span> <span class="toc-text">RedWorker</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-number">3.</span> <span class="toc-text">总结</span></a></li></ol>
 		
 		</div>
 		
 		<p><em>前言:本文是结合我自己阅读代码的心得总结而来,同时会忽略很多细节,只能作为阅读源码时的参考.如有错误,欢迎指正.</em></p>
-<h1 id="Spice简介">Spice简介</h1><blockquote>
+<h2 id="Spice简介">Spice简介</h2><blockquote>
 <p>Spice是一个开源的云计算解决方案，使客户端能显示远程虚拟主机的操作界面并且使用其设备，如键盘，鼠标，声音等。Spice给用户提供了一种如同操作本地机器一样的体验，同时尽可能把密集的CPU和GPU任务在客户端上执行。Spice能在局域网和互联网间使用，而不减少用户体验。<br><img src="/2015/08/19/spice源码分析之server-1/01.png" alt="[图0]" title="[图0]"></p>
 </blockquote>
 <p>Spice的基本组成包括:</p>
@@ -132,13 +132,13 @@ Spice是一个开源的云计算解决方案，使客户端能显示远程虚拟
 <li>服务器通过VDI接口与VDI主机程序（如QEMU）交互。</li>
 </ul>
 <p>也就是说spice服务器处于主机与客户端中间,是整个Spice的核心所在.下面我们开始从代码层面分析spice服务器<br>更多资料查看本人翻译的spice新手文档<a href="https://www.gitbook.com/book/xhansong/spice-guidebook" target="_blank" rel="external">Spice入门</a>,以及<a href="http://www.spice-space.org/" target="_blank" rel="external">官方网站</a></p>
-<h1 id="Spice_server">Spice server</h1><img src="/2015/08/19/spice源码分析之server-1/00.png" alt="[图1]" title="[图1]">
+<h2 id="Spice_server">Spice server</h2><img src="/2015/08/19/spice源码分析之server-1/00.png" alt="[图1]" title="[图1]">
 <p>图1是spice服务器的核心架构,贯穿整个源码的组织结构.<br>值得一提的是,spice server是作为一个库提供给qemu使用的,编译出来就是libspice,所以代码中没有main函数.<br>下面我们先了解一个server源码中使用到的一些核心概念,在看源码之前推荐大家先看一遍<a href="https://www.gitbook.com/book/xhansong/spice-guidebook" target="_blank" rel="external">Spice入门</a>,否则理解代码中的某些核心概念会很吃力.</p>
-<h2 id="部分宏定义">部分宏定义</h2><ul>
+<h3 id="部分宏定义">部分宏定义</h3><ul>
 <li><strong>SPICE_GNUC_DEPRECATED</strong>,其定义是<code>#define SPICE_GNUC_DEPRECATED  __attribute__((__deprecated__))</code>表示该函数以及被弃用,在编译时会给出警告</li>
 <li><strong>SPICE_GNUC_VISIBLE</strong>,其定义是<code>#define SPICE_GNUC_VISIBLE __attribute__ ((visibility (&quot;default&quot;)))</code>用于控制符号的可见性,设置为对外可见.spice作为动态链接库给qemu使用,默认隐藏函数对外部的可见性,即外部文件不能调用库里面的函数,有这个声明的函数可以被外部文件调用,即为公共函数.</li>
 </ul>
-<h2 id="公共函数">公共函数</h2><p>Server的公共函数主要在两个头文件中:</p>
+<h3 id="公共函数">公共函数</h3><p>Server的公共函数主要在两个头文件中:</p>
 <ul>
 <li><strong>spice.h</strong>:与SpiceServer结构体相关的函数,是qemu调用spice的主要函数</li>
 <li><strong>red_dispatcher.h</strong>:与QXL设备相关的函数</li>
@@ -149,7 +149,7 @@ Spice是一个开源的云计算解决方案，使客户端能显示远程虚拟
 <li><strong>spice_server_add_interface</strong>:给server注册VDI接口</li>
 <li><strong>spice_server_add_client</strong>:处理qemu接收到的客户端连接消息</li>
 </ul>
-<h2 id="VDI接口">VDI接口</h2><p>从图1中可以看到,VDI接口是spice server离qemu最近的一层,qemu主要是通过VDI接口来与spice交互的.<br>VDI接口的定义在spice.h中,结构体内部的函数指针实现都在qemu的源码里面(ui/spice-core.c)</p>
+<h3 id="VDI接口">VDI接口</h3><p>从图1中可以看到,VDI接口是spice server离qemu最近的一层,qemu主要是通过VDI接口来与spice交互的.<br>VDI接口的定义在spice.h中,结构体内部的函数指针实现都在qemu的源码里面(ui/spice-core.c)</p>
 <ul>
 <li><p><strong>SpiceCoreInterface</strong>:核心接口,用于创建,添加,取消定时和监听事件</p>
 <figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">SpiceTimer *<span class="list">(<span class="keyword">*timer_add</span>)</span><span class="list">(<span class="keyword">SpiceTimerFunc</span> func, void <span class="variable">*opaque);</span><br><span class="line">void (*</span>timer_start)</span><span class="list">(<span class="keyword">SpiceTimer</span> <span class="variable">*timer, uint32_t ms);</span><br><span class="line">void (*</span>timer_cancel)</span><span class="list">(<span class="keyword">SpiceTimer</span> <span class="variable">*timer);</span><br><span class="line">void (*</span>timer_remove)</span><span class="list">(<span class="keyword">SpiceTimer</span> <span class="variable">*timer);</span><br><span class="line">SpiceWatch *</span><span class="list">(<span class="keyword">*watch_add</span>)</span><span class="list">(<span class="keyword">int</span> fd, int event_mask, SpiceWatchFunc func, void <span class="variable">*opaque);</span><br><span class="line">void (*</span>watch_update_mask)</span><span class="list">(<span class="keyword">SpiceWatch</span> <span class="variable">*watch, int event_mask);</span><br><span class="line">void (*</span>watch_remove)</span><span class="list">(<span class="keyword">SpiceWatch</span> <span class="variable">*watch);</span><br><span class="line">void (*</span>channel_event)</span><span class="list">(<span class="keyword">int</span> event, SpiceChannelEventInfo <span class="variable">*info);</span></span></span></span><br></pre></td></tr></table></figure>
@@ -176,7 +176,7 @@ Spice是一个开源的云计算解决方案，使客户端能显示远程虚拟
 </li>
 <li><strong>SpiceRecordInterface</strong>:录音接口</li>
 </ul>
-<h2 id="Channel">Channel</h2><p>从图1可以看到,VDI接口之后即是Channel(QXLInterface比较特殊,这个后面再说).<br>Channel的主要作用是使用对应的TCP连接传输消息给客户端,保证其传输的可靠性,其本质是通道,不同的Channel传输不同的消息.</p>
+<h3 id="Channel">Channel</h3><p>从图1可以看到,VDI接口之后即是Channel(QXLInterface比较特殊,这个后面再说).<br>Channel的主要作用是使用对应的TCP连接传输消息给客户端,保证其传输的可靠性,其本质是通道,不同的Channel传输不同的消息.</p>
 <p>spice中主要有六种Channel:</p>
 <ul>
 <li><strong>MainChannel</strong>:与客户端连接的建立和断开有关</li>
@@ -193,14 +193,14 @@ Spice是一个开源的云计算解决方案，使客户端能显示远程虚拟
 <li>Playback和Record通道有它们各自的处理程序(snd_worker.c)</li>
 </ul>
 <p>六种Channel中只有DisplayChannel和CursorChannel是单独在工作线程工作的,其他都是在qemu线程工作.</p>
-<h2 id="Dispatcher">Dispatcher</h2><img src="/2015/08/19/spice源码分析之server-1/02.png" alt="[图3]" title="[图3]">
+<h3 id="Dispatcher">Dispatcher</h3><img src="/2015/08/19/spice源码分析之server-1/02.png" alt="[图3]" title="[图3]">
 <p>前面提到Channel负责传输消息,而Dispatcher则负责处理消息,并且调度Channel.<br>Dispatcher使用socketpair来与外界交互,例如监听事件,传输结果等.<br>这里存在两种Dispatcher</p>
 <ul>
 <li><strong>MainDispatcher</strong>:在qemu线程中监听socket事件,处理客户端连接的初始化,建立和断开等,跟MainChannel相关</li>
 <li><strong>RedDispatcher</strong>:在worker线程中监听socket事件,处理QXL设备有关的消息,跟DisplayChannel,CursorChannel相关,图3描述的就是RedDispatcher的工作流程.在图1我们看到QXLInterface与其他接口不一样,与Channel的联系中间多了一个RedDispatcher,它们在单独的Worker线程中工作,提供了QEMU与接收的图像命令处理和渲染过程的独立性</li>
 </ul>
-<h2 id="RedWorker">RedWorker</h2><p>RedWorker可以说是server的核心,80%代码跟它有关,毕竟它负责图像渲染和传输,这是spice最难最复杂的部分,涉及图像的压缩,渲染,局部刷新等核心技术.<br>RedWorker在单独线程上工作,通过QXLInterface与QEMU的QXL设备直接交互,同时控制DisplayChannel,CursorChannel,并且拥有自己的poll事件驱动核心.而其他的Channel都依赖于QEMU线程.</p>
-<h1 id="总结">总结</h1><ul>
+<h3 id="RedWorker">RedWorker</h3><p>RedWorker可以说是server的核心,80%代码跟它有关,毕竟它负责图像渲染和传输,这是spice最难最复杂的部分,涉及图像的压缩,渲染,局部刷新等核心技术.<br>RedWorker在单独线程上工作,通过QXLInterface与QEMU的QXL设备直接交互,同时控制DisplayChannel,CursorChannel,并且拥有自己的poll事件驱动核心.而其他的Channel都依赖于QEMU线程.</p>
+<h2 id="总结">总结</h2><ul>
 <li>Spice server作为一个库给QEMU调用,用于支持Spice协议.</li>
 <li>server通过使用VDI接口与QEMU交互</li>
 <li>server通过使用Channel与客户端交互</li>
@@ -244,6 +244,14 @@ Spice是一个开源的云计算解决方案，使客户端能显示远程虚拟
 	
 <nav class="article-nav clearfix">
  
+ <div class="prev" >
+ <a href="/2015/08/24/Linux源码分析工具链/" title="Linux源代码分析工具链">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Linux源代码分析工具链</span>
+</a>
+</div>
+
 
 <div class="next">
 <a href="/2015/07/19/链接的基本概念/"  title="理解链接之链接的基本概念">
@@ -267,7 +275,7 @@ Spice是一个开源的云计算解决方案，使客户端能显示远程虚拟
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Spice简介"><span class="toc-number">1.</span> <span class="toc-text">Spice简介</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Spice_server"><span class="toc-number">2.</span> <span class="toc-text">Spice server</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#部分宏定义"><span class="toc-number">2.1.</span> <span class="toc-text">部分宏定义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#公共函数"><span class="toc-number">2.2.</span> <span class="toc-text">公共函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#VDI接口"><span class="toc-number">2.3.</span> <span class="toc-text">VDI接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Channel"><span class="toc-number">2.4.</span> <span class="toc-text">Channel</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Dispatcher"><span class="toc-number">2.5.</span> <span class="toc-text">Dispatcher</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RedWorker"><span class="toc-number">2.6.</span> <span class="toc-text">RedWorker</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#总结"><span class="toc-number">3.</span> <span class="toc-text">总结</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Spice简介"><span class="toc-number">1.</span> <span class="toc-text">Spice简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Spice_server"><span class="toc-number">2.</span> <span class="toc-text">Spice server</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#部分宏定义"><span class="toc-number">2.1.</span> <span class="toc-text">部分宏定义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#公共函数"><span class="toc-number">2.2.</span> <span class="toc-text">公共函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#VDI接口"><span class="toc-number">2.3.</span> <span class="toc-text">VDI接口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Channel"><span class="toc-number">2.4.</span> <span class="toc-text">Channel</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Dispatcher"><span class="toc-number">2.5.</span> <span class="toc-text">Dispatcher</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RedWorker"><span class="toc-number">2.6.</span> <span class="toc-text">RedWorker</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-number">3.</span> <span class="toc-text">总结</span></a></li></ol>
  
   </div>
 
@@ -284,6 +292,8 @@ Spice是一个开源的云计算解决方案，使客户端能显示远程虚拟
 			<li><a href="/categories/Hexo/" title="Hexo">Hexo<sup>1</sup></a></li>
 		  
 		
+		  
+			<li><a href="/categories/Linux工具/" title="Linux工具">Linux工具<sup>1</sup></a></li>
 		  
 		
 		  
@@ -316,11 +326,7 @@ Spice是一个开源的云计算解决方案，使客户端能显示远程虚拟
 			
 		
 			
-				<li><a href="/tags/链接/" title="链接">链接<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/暴力求解/" title="暴力求解">暴力求解<sup>1</sup></a></li>
+				<li><a href="/tags/hexo/" title="hexo">hexo<sup>1</sup></a></li>
 			
 		
 			
@@ -332,7 +338,7 @@ Spice是一个开源的云计算解决方案，使客户端能显示远程虚拟
 			
 		
 			
-				<li><a href="/tags/hexo/" title="hexo">hexo<sup>1</sup></a></li>
+				<li><a href="/tags/暴力求解/" title="暴力求解">暴力求解<sup>1</sup></a></li>
 			
 		
 			
@@ -341,6 +347,18 @@ Spice是一个开源的云计算解决方案，使客户端能显示远程虚拟
 		
 			
 				<li><a href="/tags/虚拟化/" title="虚拟化">虚拟化<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/链接/" title="链接">链接<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/源代码分析/" title="源代码分析">源代码分析<sup>1</sup></a></li>
 			
 		
 		</ul>

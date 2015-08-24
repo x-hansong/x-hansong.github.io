@@ -1,0 +1,565 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+<meta name="google-site-verification" content="6wlbKgFEjRhJyXF4xjxEpA_IpuycvAMznqNQvAZ0OCY" />
+<meta name="baidu-site-verification" content="28u1lswj4v" />
+  <meta charset="UTF-8">
+  
+    <title>Linux源代码分析工具链 | ShareHub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Yonah-潇">
+    
+
+    
+    <meta name="description" content="前言看源代码是一个程序员必须经历的事情,也是可以提升能力的一个捷径.个人认为: 要完全掌握一个软件的方法只有阅读源码在Windows下有sourceinsight这个源码阅读软件(虽然我没用过,但是网上评价还不错),由于我是个Linuxer,并不喜欢用Windows,所以自然是选择在Linux下阅读源码的工具了.下面我将逐一介绍在Linux下阅读源码的工具.
+vim+ctags+cscope源码阅">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux源代码分析工具链">
+<meta property="og:url" content="https://github.com/x-hansong/2015/08/24/Linux源码分析工具链/index.html">
+<meta property="og:site_name" content="ShareHub">
+<meta property="og:description" content="前言看源代码是一个程序员必须经历的事情,也是可以提升能力的一个捷径.个人认为: 要完全掌握一个软件的方法只有阅读源码在Windows下有sourceinsight这个源码阅读软件(虽然我没用过,但是网上评价还不错),由于我是个Linuxer,并不喜欢用Windows,所以自然是选择在Linux下阅读源码的工具了.下面我将逐一介绍在Linux下阅读源码的工具.
+vim+ctags+cscope源码阅">
+<meta property="og:image" content="https://github.com/x-hansong/2015/08/24/Linux源码分析工具链/00.png">
+<meta property="og:updated_time" content="2015-08-24T06:54:06.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux源代码分析工具链">
+<meta name="twitter:description" content="前言看源代码是一个程序员必须经历的事情,也是可以提升能力的一个捷径.个人认为: 要完全掌握一个软件的方法只有阅读源码在Windows下有sourceinsight这个源码阅读软件(虽然我没用过,但是网上评价还不错),由于我是个Linuxer,并不喜欢用Windows,所以自然是选择在Linux下阅读源码的工具了.下面我将逐一介绍在Linux下阅读源码的工具.
+vim+ctags+cscope源码阅">
+
+    
+    <link rel="alternative" href="/atom.xml" title="ShareHub" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="ShareHub" title="ShareHub"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="ShareHub">ShareHub</a></h1>
+				<h2 class="blog-motto">悲观的意志,乐观的头脑</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">主页|Home</a></li>
+					
+						<li><a href="/archives">归档|Archives</a></li>
+					
+						<li><a href="/about">关于|About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:github.com/x-hansong">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/08/24/Linux源码分析工具链/" title="Linux源代码分析工具链" itemprop="url">Linux源代码分析工具链</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Yonah-潇" target="_blank" itemprop="author">Yonah-潇</a>
+		
+  <p class="article-time">
+    <time datetime="2015-08-24T02:02:11.000Z" itemprop="datePublished"> 发表于 2015-08-24</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#vim+ctags+cscope"><span class="toc-number">2.</span> <span class="toc-text">vim+ctags+cscope</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#安装"><span class="toc-number">2.1.</span> <span class="toc-text">安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用"><span class="toc-number">2.2.</span> <span class="toc-text">使用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#vim"><span class="toc-number">2.2.1.</span> <span class="toc-text">vim</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ctags"><span class="toc-number">2.2.2.</span> <span class="toc-text">ctags</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#cscope"><span class="toc-number">2.2.3.</span> <span class="toc-text">cscope</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#doxygen"><span class="toc-number">3.</span> <span class="toc-text">doxygen</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#gdb"><span class="toc-number">4.</span> <span class="toc-text">gdb</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#后记"><span class="toc-number">5.</span> <span class="toc-text">后记</span></a></li></ol>
+		
+		</div>
+		
+		<h2 id="前言">前言</h2><p>看源代码是一个程序员必须经历的事情,也是可以提升能力的一个捷径.个人认为: <strong>要完全掌握一个软件的方法只有阅读源码</strong><br>在Windows下有sourceinsight这个源码阅读软件(虽然我没用过,但是网上评价还不错),由于我是个Linuxer,并不喜欢用Windows,所以自然是选择在Linux下阅读源码的工具了.<br>下面我将逐一介绍在Linux下阅读源码的工具.</p>
+<h2 id="vim+ctags+cscope">vim+ctags+cscope</h2><p>源码阅读三剑客.vim配合ctags和cscope,足以在源代码里面自由翱翔,在函数和变量间自由跳转.</p>
+<h3 id="安装">安装</h3><figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-<span class="built_in">get</span> install <span class="keyword">vim</span> ctags <span class="keyword">cscope</span></span><br></pre></td></tr></table></figure>
+<h3 id="使用">使用</h3><h4 id="vim">vim</h4><p>vim的使用就略过了,网上资料很多,不是一篇文章能说完的,未来我可能会写一篇vim的使用心得<br>推荐一篇<a href="http://coolshell.cn/articles/5426.html" target="_blank" rel="external">简明 Vim 练级攻略</a>,看完就差不多会用了.</p>
+<h4 id="ctags">ctags</h4><p>ctags的使用很简单,vim已经内置了对ctags的支持<br>首先在源代码根目录执行<code>ctags -R</code>,递归的为源码建立tags,在根目录会生成一个Tags的文件,存放各种函数和变量的tag,便于跳转</p>
+<ul>
+<li>使光标在函数或变量上,<code>Ctrl + ]</code>即可跳转到其定义处</li>
+<li><code>Ctrl + t</code>可以回到你跳转之前的位置</li>
+</ul>
+<p>对于简单的代码,ctags就够用了,但是对于比较复杂的代码来说,ctags显得有点力不从心,于是,下一位剑客就登场了.</p>
+<h4 id="cscope">cscope</h4><p>vim同样内置了对cscope的支持.<br>首先在源代码根目录执行<code>cscope -Rbq</code>,就会生成cscope.out文件(索引数据库)</p>
+<ul>
+<li>-R: 在生成索引文件时，搜索子目录树中的代码</li>
+<li>-b: 只生成索引文件，不进入cscope的界面</li>
+<li>-q: 生成cscope.in.out和cscope.po.out文件，加快cscope的索引速度</li>
+</ul>
+<p>然后在vim中执行<code>:cs add cscope.out</code>,添加数据库.<br>接下来就可以使用<code>:cs find x var</code>进行查找.(x代表查询选项,var表示要查找的函数或变量名)<br>cscope支持8种查询方式</p>
+<ul>
+<li>s: 查找C语言符号，即查找函数名、宏、枚举值等出现的地方</li>
+<li>g: 查找函数、宏、枚举等定义的位置，类似ctags所提供的功能</li>
+<li>d: 查找本函数调用的函数</li>
+<li>c: 查找调用本函数的函数</li>
+<li>t: 查找指定的字符串</li>
+<li>e: 查找egrep模式，相当于egrep功能，但查找速度快多了</li>
+<li>f: 查找并打开文件，类似vim的find功能</li>
+<li>i: 查找包含本文件的文件</li>
+</ul>
+<p>例如，我们想在vim 7.0的源代码中查找调用do_cscope()函数的函数，我们可以输入：”:cs find c do_cscope“，回车后发现没有找到匹配的功能，可能并没有函数调用do_cscope()。我们再输入”:cs find s do_cscope“，查找这个C符号出现的位置，现在vim列出了这个符号出现的所有位置。</p>
+<p>每次都有输入<code>cs find</code>来查找数据是不是有点麻烦,有没有更方便的方法呢.当然有,vim的神奇之处在其可定制性.提供一份cscope的配置,将其放在.vimrc中即可.<br><figure class="highlight ceylon"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">"""</span><br><span class="line">" cscope setting</span><br><span class="line">"""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span><span class="string">""""""</span></span><br><span class="line"><span class="keyword">if</span> has(<span class="string">"cscope"</span>)</span><br><span class="line">  set csprg=/usr/bin/cscope</span><br><span class="line">  set csto=<span class="number">1</span></span><br><span class="line">  set cst</span><br><span class="line">  set nocsverb</span><br><span class="line">  <span class="string">" add any database in current directory</span><br><span class="line">  if filereadable("</span>cscope.<span class="keyword">out</span><span class="string">")</span><br><span class="line">      cs add cscope.out</span><br><span class="line">  endif</span><br><span class="line">  set csverb</span><br><span class="line">endif</span><br><span class="line"></span><br><span class="line">nmap &lt;C-@&gt;s :cs find s &lt;C-R&gt;=expand("</span>&lt;cword&gt;<span class="string">")&lt;CR&gt;&lt;CR&gt;</span><br><span class="line">nmap &lt;C-@&gt;g :cs find g &lt;C-R&gt;=expand("</span>&lt;cword&gt;<span class="string">")&lt;CR&gt;&lt;CR&gt;</span><br><span class="line">nmap &lt;C-@&gt;c :cs find c &lt;C-R&gt;=expand("</span>&lt;cword&gt;<span class="string">")&lt;CR&gt;&lt;CR&gt;</span><br><span class="line">nmap &lt;C-@&gt;t :cs find t &lt;C-R&gt;=expand("</span>&lt;cword&gt;<span class="string">")&lt;CR&gt;&lt;CR&gt;</span><br><span class="line">nmap &lt;C-@&gt;e :cs find e &lt;C-R&gt;=expand("</span>&lt;cword&gt;<span class="string">")&lt;CR&gt;&lt;CR&gt;</span><br><span class="line">nmap &lt;C-@&gt;f :cs find f &lt;C-R&gt;=expand("</span>&lt;cfile&gt;<span class="string">")&lt;CR&gt;&lt;CR&gt;</span><br><span class="line">nmap &lt;C-@&gt;i :cs find i ^&lt;C-R&gt;=expand("</span>&lt;cfile&gt;<span class="string">")&lt;CR&gt;$&lt;CR&gt;</span><br><span class="line">nmap &lt;C-@&gt;d :cs find d &lt;C-R&gt;=expand("</span>&lt;cword&gt;<span class="string">")&lt;CR&gt;&lt;CR&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>上面的配置即把<code>Ctrl + @</code>作为<code>:cs find</code>的快捷键,也就是说要查找某个函数名,只需要把光标放在函数名上,按下<code>Ctrl + @ + s</code>即可,简直不能更方便.而且你可以自己修改配置,映射到自己觉得舒服的快捷键上.</p>
+<p>本着不重复造轮子的原则,我就简单的写了cscope的基本用法,其实基本上就够用了,进阶的用法参考这篇文章<a href="http://easwy.com/blog/archives/advanced-vim-skills-cscope/" target="_blank" rel="external">vi/vim使用进阶: 程序员的利器 – cscope</a></p>
+<h2 id="doxygen">doxygen</h2><p>上面我们讲的是用vim来查看源代码,但是面对几十万代码的时候,想要看清楚各个结构体之间的关系就不是vim能够做到的了.这时候我们就需要doxygen来帮手了.</p>
+<blockquote>
+<p>Doxygen is the de facto standard tool for generating documentation from annotated C++ sources, but it also supports other popular programming languages such as C, Objective-C, C#, PHP, Java, Python, IDL (Corba, Microsoft, and UNO/OpenOffice flavors), Fortran, VHDL, Tcl, and to some extent D.</p>
+</blockquote>
+<p>doxygen是一个根据源代码生成文档的工具,这货虽然主要是给C++用的,但是它也对其他语言有支持.<br>安装直接去<a href="http://www.stack.nl/~dimitri/doxygen/index.html" target="_blank" rel="external">官网</a>,按照其指导安装即可<br>下面根据我生成qemu源代码文档的例子,介绍一下doxygen的使用方法.</p>
+<p>首先,在源代码根目录执行<code>doxygen -g</code>,然后在根目录就会突然冒出一个名为Doxyfile的文件,这个文件就是doxygen生成文档的配置文件了.<br>那么,重点来了,怎么配置这个文件,默认的配置是根据代码生成各个结构体的成员数据,然后生成html和latex两个文件夹,分别是网页和latex文档.<br>说实话,默认生成的文档并没有什么卵用,除了让你更方便的看到各个结构体的组成成员.我们关心的是各个结构体之间的关系,这是针对C而言的.对与C++和java而言,关心的是类之间的关系.所以,默认的配置肯定是要修改的.至于怎么改,看<a href="http://www.stack.nl/~dimitri/doxygen/manual/index.html" target="_blank" rel="external">官方文档</a>.</p>
+<p>当然了,如果这篇文章唯一给出的建议就是看文档,那这篇文章有什么意义呢.大家都知道看文档可以解决问题,但是时间成本太高,而且是英文的.写这篇文章的目的是分享自己学习得到的经验,让大家少走弯路,如果不能解决你的问题,只能去看文档了</p>
+<p>接下来我根据我自己看文档用到的配置跟大家解释一下.<br>首先,Doxygen里面的配置可谓又臭又长,你绝对不会有读完它的欲望.所以我给出几个关键的配置项,到时候搜索它修改即可</p>
+<ul>
+<li><p>这是针对各种语言优化输出的选项,默认都是NO,因为它不清楚你用的是什么语言(话说看一下后缀不就知道了吗…)</p>
+  <figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">OPTIMIZE_OUTPUT_FOR_C</span></span><br><span class="line">OPTIMIZE_OUTPUT_JAVA</span><br><span class="line">OPTIMIZE_FOR_FORTRAN</span><br><span class="line">OPTIMIZE_OUTPUT_VHDL</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>这个是生成文档的类型的选项,默认生成html和latex,共支持六种类型的文档,每种类型的生成配置也是很多,具体根据需要配置</p>
+  <figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">GENERATE_HTML</span></span><br><span class="line">GENERATE_LATEX</span><br><span class="line">GENERATE_RTF</span><br><span class="line">GENERATE_XML</span><br><span class="line">GENERATE_DOCBOOK</span><br><span class="line">GENERATE_MAN</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>关于生成图像的选项.doxygen使用dot这个工具来绘图,所以要先执行<code>sudo apt-get install graphviz</code>安装dot.在设置好这个绘图选项之后,doxygen就会生成各个结构体的关系,对于类会生成函数调用关系(我没试过,因为只试过C的).</p>
+  <figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">HAVE_DOT <span class="list">(一定要置为YES,后面的选项都依赖这个)</span></span><br><span class="line">DOT_NUM_THREADS <span class="list">(使用dot绘图的线程数量,越多越快,我一般是设置跟cpu的核数一样)</span></span><br></pre></td></tr></table></figure>
+<p>  给一个结构体关系图,就是doxygen生成的.</p>
+  <img src="/2015/08/24/Linux源码分析工具链/00.png" alt="[machine_class]" title="[machine_class]">
+</li>
+</ul>
+<h2 id="gdb">gdb</h2><p>最后一个工具,大名鼎鼎的gdb.分析源码执行流程的最好方式的是运行它,然后一步步执行.用来观察它最好的工具当然是gdb了(针对C/C++).<br>gdb的使用我也不打算造轮子,直接参考<a href="http://wiki.ubuntu.org.cn/index.php?title=%E7%94%A8GDB%E8%B0%83%E8%AF%95%E7%A8%8B%E5%BA%8F&amp;variant=zh-hans" target="_blank" rel="external">用GDB调试程序</a>,这篇写的很好,通俗易懂.</p>
+<h2 id="后记">后记</h2><p>以上就是我在阅读源码的时候使用的Linux工具,三剑客<strong>vim+ctags+cscope</strong>,两板斧<strong>doxygen gdb</strong>,足以驰骋源代码的江湖.</p>
+<p>以上工具,vim和gdb是最难学的,学习曲线很陡峭.但是学好之后,就能守得云开见月明.</p>
+<p><em>参考文章,感谢帮助</em><br><a href="http://easwy.com/blog/archives/advanced-vim-skills-cscope/" target="_blank" rel="external">vi/vim使用进阶: 程序员的利器 – cscope</a></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Linux工具/">Linux工具</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Linux/">Linux</a><a href="/tags/源代码分析/">源代码分析</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="https://github.com/x-hansong/2015/08/24/Linux源码分析工具链/" data-title="Linux源代码分析工具链 | ShareHub" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2015/08/19/spice源码分析之server-1/"  title="spice源码分析之server(1)">
+ <strong>下一篇：</strong><br/> 
+ <span>spice源码分析之server(1)
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comments" class="comment">
+	<div class="ds-thread" data-thread-key="2015/08/24/Linux源码分析工具链/" data-title="Linux源代码分析工具链" data-url="https://github.com/x-hansong/2015/08/24/Linux源码分析工具链/"></div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#vim+ctags+cscope"><span class="toc-number">2.</span> <span class="toc-text">vim+ctags+cscope</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#安装"><span class="toc-number">2.1.</span> <span class="toc-text">安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用"><span class="toc-number">2.2.</span> <span class="toc-text">使用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#vim"><span class="toc-number">2.2.1.</span> <span class="toc-text">vim</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ctags"><span class="toc-number">2.2.2.</span> <span class="toc-text">ctags</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#cscope"><span class="toc-number">2.2.3.</span> <span class="toc-text">cscope</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#doxygen"><span class="toc-number">3.</span> <span class="toc-text">doxygen</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#gdb"><span class="toc-number">4.</span> <span class="toc-text">gdb</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#后记"><span class="toc-number">5.</span> <span class="toc-text">后记</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/Hexo/" title="Hexo">Hexo<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Linux工具/" title="Linux工具">Linux工具<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/理解链接/" title="理解链接">理解链接<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/算法学习/" title="算法学习">算法学习<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/虚拟化/" title="虚拟化">虚拟化<sup>2</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/算法/" title="算法">算法<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/spice/" title="spice">spice<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/hexo/" title="hexo">hexo<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/分治法/" title="分治法">分治法<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/减治法/" title="减治法">减治法<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/暴力求解/" title="暴力求解">暴力求解<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/github/" title="github">github<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/虚拟化/" title="虚拟化">虚拟化<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/链接/" title="链接">链接<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/源代码分析/" title="源代码分析">源代码分析<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m XiaoHanSong, a student majoring in SE. <br/>
+			This is my blog for sharing my ideas.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		<a href="https://github.com/https://github.com/x-hansong" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<a href="mailto:x.hansong.scut@gmail.com" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2015 
+		
+		<a href="/about" target="_blank" title="Yonah-潇">Yonah-潇</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+        getSize();
+        if (myWidth >= 1024) {
+          c.click();
+        }
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#nothing"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"yonah"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fe3d10060c65a55e2812e507319e77159' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>
