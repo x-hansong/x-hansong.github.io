@@ -5,7 +5,7 @@
   <subtitle><![CDATA[悲观的意志,乐观的头脑]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="https://github.com/x-hansong//"/>
-  <updated>2015-08-24T06:54:06.000Z</updated>
+  <updated>2015-08-25T02:55:20.000Z</updated>
   <id>https://github.com/x-hansong//</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://github.com/x-hansong/2015/08/24/Linux%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7%E9%93%BE/"/>
     <id>https://github.com/x-hansong/2015/08/24/Linux源码分析工具链/</id>
     <published>2015-08-24T02:02:11.000Z</published>
-    <updated>2015-08-24T06:54:06.000Z</updated>
+    <updated>2015-08-25T02:55:20.000Z</updated>
     <content type="html"><![CDATA[<h2 id="前言">前言</h2><p>看源代码是一个程序员必须经历的事情,也是可以提升能力的一个捷径.个人认为: <strong>要完全掌握一个软件的方法只有阅读源码</strong><br>在Windows下有sourceinsight这个源码阅读软件(虽然我没用过,但是网上评价还不错),由于我是个Linuxer,并不喜欢用Windows,所以自然是选择在Linux下阅读源码的工具了.<br>下面我将逐一介绍在Linux下阅读源码的工具.</p>
 <h2 id="vim+ctags+cscope">vim+ctags+cscope</h2><p>源码阅读三剑客.vim配合ctags和cscope,足以在源代码里面自由翱翔,在函数和变量间自由跳转.</p>
 <h3 id="安装">安装</h3><figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-<span class="built_in">get</span> install <span class="keyword">vim</span> ctags <span class="keyword">cscope</span></span><br></pre></td></tr></table></figure>
@@ -56,8 +56,8 @@
 <blockquote>
 <p>Doxygen is the de facto standard tool for generating documentation from annotated C++ sources, but it also supports other popular programming languages such as C, Objective-C, C#, PHP, Java, Python, IDL (Corba, Microsoft, and UNO/OpenOffice flavors), Fortran, VHDL, Tcl, and to some extent D.</p>
 </blockquote>
-<p>doxygen是一个根据源代码生成文档的工具,这货虽然主要是给C++用的,但是它也对其他语言有支持.<br>安装直接去<a href="http://www.stack.nl/~dimitri/doxygen/index.html" target="_blank" rel="external">官网</a>,按照其指导安装即可<br>下面根据我生成qemu源代码文档的例子,介绍一下doxygen的使用方法.</p>
-<p>首先,在源代码根目录执行<code>doxygen -g</code>,然后在根目录就会突然冒出一个名为Doxyfile的文件,这个文件就是doxygen生成文档的配置文件了.<br>那么,重点来了,怎么配置这个文件,默认的配置是根据代码生成各个结构体的成员数据,然后生成html和latex两个文件夹,分别是网页和latex文档.<br>说实话,默认生成的文档并没有什么卵用,除了让你更方便的看到各个结构体的组成成员.我们关心的是各个结构体之间的关系,这是针对C而言的.对与C++和java而言,关心的是类之间的关系.所以,默认的配置肯定是要修改的.至于怎么改,看<a href="http://www.stack.nl/~dimitri/doxygen/manual/index.html" target="_blank" rel="external">官方文档</a>.</p>
+<p>doxygen是一个根据源代码生成文档的工具,这货虽然主要是给C++用的,但是它也对其他语言有支持.<br>安装直接去<a href="http://www.stack.nl/~dimitri/doxygen/index.html" target="_blank" rel="external">官网</a>,按照其指导安装即可<br>下面介绍一下doxygen的使用方法.</p>
+<p>首先,在源代码根目录执行<code>doxygen -g</code>,然后在根目录就会突然冒出一个名为<strong>Doxyfile</strong>的文件,这个文件就是doxygen生成文档的配置文件了.<br>那么,重点来了,怎么配置这个文件,默认的配置是根据代码生成各个结构体的成员数据,然后生成html和latex两个文件夹,分别是网页和latex文档.<br>说实话,默认生成的文档并没有什么卵用,除了让你更方便的看到各个结构体的组成成员.我们关心的是各个结构体之间的关系,这是针对C而言的.对与C++和java而言,关心的是类之间的关系.所以,默认的配置肯定是要修改的.至于怎么改,看<a href="http://www.stack.nl/~dimitri/doxygen/manual/index.html" target="_blank" rel="external">官方文档</a>.</p>
 <p>当然了,如果这篇文章唯一给出的建议就是看文档,那这篇文章有什么意义呢.大家都知道看文档可以解决问题,但是时间成本太高,而且是英文的.写这篇文章的目的是分享自己学习得到的经验,让大家少走弯路,如果不能解决你的问题,只能去看文档了</p>
 <p>接下来我根据我自己看文档用到的配置跟大家解释一下.<br>首先,Doxygen里面的配置可谓又臭又长,你绝对不会有读完它的欲望.所以我给出几个关键的配置项,到时候搜索它修改即可</p>
 <ul>
@@ -73,6 +73,7 @@
   <img src="/2015/08/24/Linux源码分析工具链/00.png" alt="[machine_class]" title="[machine_class]">
 </li>
 </ul>
+<p>最后一步,在源码根目录执行<code>doxygen</code>,它会自动找到Doxygen配置,根据配置生成文档.</p>
 <h2 id="gdb">gdb</h2><p>最后一个工具,大名鼎鼎的gdb.分析源码执行流程的最好方式的是运行它,然后一步步执行.用来观察它最好的工具当然是gdb了(针对C/C++).<br>gdb的使用我也不打算造轮子,直接参考<a href="http://wiki.ubuntu.org.cn/index.php?title=%E7%94%A8GDB%E8%B0%83%E8%AF%95%E7%A8%8B%E5%BA%8F&amp;variant=zh-hans" target="_blank" rel="external">用GDB调试程序</a>,这篇写的很好,通俗易懂.</p>
 <h2 id="后记">后记</h2><p>以上就是我在阅读源码的时候使用的Linux工具,三剑客<strong>vim+ctags+cscope</strong>,两板斧<strong>doxygen gdb</strong>,足以驰骋源代码的江湖.</p>
 <p>以上工具,vim和gdb是最难学的,学习曲线很陡峭.但是学好之后,就能守得云开见月明.</p>
