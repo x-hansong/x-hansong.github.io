@@ -22,7 +22,7 @@ vim+ctags+cscope源码阅">
 <meta property="og:description" content="前言看源代码是一个程序员必须经历的事情,也是可以提升能力的一个捷径.个人认为: 要完全掌握一个软件的方法只有阅读源码在Windows下有sourceinsight这个源码阅读软件(虽然我没用过,但是网上评价还不错),由于我是个Linuxer,并不喜欢用Windows,所以自然是选择在Linux下阅读源码的工具了.下面我将逐一介绍在Linux下阅读源码的工具.
 vim+ctags+cscope源码阅">
 <meta property="og:image" content="https://github.com/x-hansong/2015/08/24/Linux源码分析工具链/00.png">
-<meta property="og:updated_time" content="2015-08-25T02:55:20.000Z">
+<meta property="og:updated_time" content="2015-08-26T08:42:46.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Linux源代码分析工具链">
 <meta name="twitter:description" content="前言看源代码是一个程序员必须经历的事情,也是可以提升能力的一个捷径.个人认为: 要完全掌握一个软件的方法只有阅读源码在Windows下有sourceinsight这个源码阅读软件(虽然我没用过,但是网上评价还不错),由于我是个Linuxer,并不喜欢用Windows,所以自然是选择在Linux下阅读源码的工具了.下面我将逐一介绍在Linux下阅读源码的工具.
@@ -155,7 +155,10 @@ vim+ctags+cscope源码阅">
 <li><p>关于生成图像的选项.doxygen使用dot这个工具来绘图,所以要先执行<code>sudo apt-get install graphviz</code>安装dot.在设置好这个绘图选项之后,doxygen就会生成各个结构体的关系,对于类会生成函数调用关系(我没试过,因为只试过C的).</p>
   <figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">HAVE_DOT <span class="list">(一定要置为YES,后面的选项都依赖这个)</span></span><br><span class="line">DOT_NUM_THREADS <span class="list">(使用dot绘图的线程数量,越多越快,我一般是设置跟cpu的核数一样)</span></span><br></pre></td></tr></table></figure>
 <p>  给一个结构体关系图,就是doxygen生成的.</p>
-  <img src="/2015/08/24/Linux源码分析工具链/00.png" alt="[machine_class]" title="[machine_class]">
+  <img src="/2015/08/24/Linux源码分析工具链/00.png" alt="[machine_class]" title="[machine_class]"></li>
+<li><p>关于源码搜索路径,默认是搜索本目录的源代码,大部分情况下源码是分布在各个子目录的.</p>
+  <figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="setting">RECURSIVE = <span class="value"><span class="keyword">YES</span></span></span></span><br></pre></td></tr></table></figure>
+<p>  默认RECURSIVE是NO,所以记得把它设置为YES,递归搜索子目录. <em>感谢soglad的留言提醒</em></p>
 </li>
 </ul>
 <p>最后一步,在源码根目录执行<code>doxygen</code>,它会自动找到Doxygen配置,根据配置生成文档.</p>
