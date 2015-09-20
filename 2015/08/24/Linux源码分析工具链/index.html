@@ -2,6 +2,7 @@
  <!DOCTYPE HTML>
 <html lang="zh-CN">
 <head>
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
 <meta name="google-site-verification" content="6wlbKgFEjRhJyXF4xjxEpA_IpuycvAMznqNQvAZ0OCY" />
 <meta name="baidu-site-verification" content="28u1lswj4v" />
   <meta charset="UTF-8">
@@ -22,7 +23,7 @@ vim+ctags+cscope源码阅">
 <meta property="og:description" content="前言看源代码是一个程序员必须经历的事情,也是可以提升能力的一个捷径.个人认为: 要完全掌握一个软件的方法只有阅读源码在Windows下有sourceinsight这个源码阅读软件(虽然我没用过,但是网上评价还不错),由于我是个Linuxer,并不喜欢用Windows,所以自然是选择在Linux下阅读源码的工具了.下面我将逐一介绍在Linux下阅读源码的工具.
 vim+ctags+cscope源码阅">
 <meta property="og:image" content="https://github.com/x-hansong/2015/08/24/Linux源码分析工具链/00.png">
-<meta property="og:updated_time" content="2015-08-26T08:42:46.000Z">
+<meta property="og:updated_time" content="2015-09-20T06:58:54.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Linux源代码分析工具链">
 <meta name="twitter:description" content="前言看源代码是一个程序员必须经历的事情,也是可以提升能力的一个捷径.个人认为: 要完全掌握一个软件的方法只有阅读源码在Windows下有sourceinsight这个源码阅读软件(虽然我没用过,但是网上评价还不错),由于我是个Linuxer,并不喜欢用Windows,所以自然是选择在Linux下阅读源码的工具了.下面我将逐一介绍在Linux下阅读源码的工具.
@@ -69,11 +70,10 @@ vim+ctags+cscope源码阅">
 					
 					<li>
  					
-					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
-						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
-						<input type="hidden" name="q" value="site:github.com/x-hansong">
-					</form>
+						<form class="search">
+							<label>Search</label>
+						<input type="text" id="ts-search-input" name="q" size="30" placeholder="搜索"><br>
+						</form>
 					
 					</li>
 				</ul>
@@ -154,7 +154,7 @@ vim+ctags+cscope源码阅">
   <figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">GENERATE_HTML</span></span><br><span class="line">GENERATE_LATEX</span><br><span class="line">GENERATE_RTF</span><br><span class="line">GENERATE_XML</span><br><span class="line">GENERATE_DOCBOOK</span><br><span class="line">GENERATE_MAN</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>关于生成图像的选项.doxygen使用dot这个工具来绘图,所以要先执行<code>sudo apt-get install graphviz</code>安装dot.在设置好这个绘图选项之后,doxygen就会生成各个结构体的关系,对于类会生成函数调用关系(我没试过,因为只试过C的).</p>
-  <figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">HAVE_DOT <span class="list">(一定要置为YES,后面的选项都依赖这个)</span></span><br><span class="line">DOT_NUM_THREADS <span class="list">(使用dot绘图的线程数量,越多越快,我一般是设置跟cpu的核数一样)</span></span><br></pre></td></tr></table></figure>
+  <figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">H<span class="built_in">AVE_DOT</span> (一定要置为<span class="literal">YES</span>,后面的选项都依赖这个)</span><br><span class="line">DOT_NUM_THREADS (使用dot绘图的线程数量,越多越快,我一般是设置跟cpu的核数一样)</span><br><span class="line"><span class="comment">//以下两个选项跟生成函数调用关系图有关</span></span><br><span class="line"><span class="built_in">CALL_GRAPH</span></span><br><span class="line"><span class="built_in">CALLER_GRAPH</span></span><br><span class="line">EXTRACT_ALL <span class="comment">//把所有实体都输出到文档,不管它是否能被描述</span></span><br><span class="line">EXTRACT_STATIC <span class="comment">//把静态变量也输出到文档中</span></span><br><span class="line">EXTRACT_PRIVATE <span class="comment">//把私有变量也输出到文档中</span></span><br></pre></td></tr></table></figure>
 <p>  给一个结构体关系图,就是doxygen生成的.</p>
   <img src="/2015/08/24/Linux源码分析工具链/00.png" alt="[machine_class]" title="[machine_class]"></li>
 <li><p>关于源码搜索路径,默认是搜索本目录的源代码,大部分情况下源码是分布在各个子目录的.</p>
@@ -389,6 +389,7 @@ vim+ctags+cscope源码阅">
 <script src="/js/jquery.imagesloaded.min.js"></script>
 <script src="/js/gallery.js"></script>
 
+
 <script type="text/javascript">
 $(document).ready(function(){ 
   $('.navbar').click(function(){
@@ -510,6 +511,13 @@ $(document).ready(function(){
     || document.getElementsByTagName('body')[0]).appendChild(ds);
   })();
 </script> 
+     
+  	  <script type="text/javascript">
+  		var duoshuo_user_ID = 7607035
+  	  </script>
+<script src="/js/ua-parser.min.js"></script>
+<script src="/js/hook-duoshuo.js"></script>
+
 
 
 
@@ -569,6 +577,23 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
 <!-- MathJax End -->
 
 <!-- Tiny_search Begin -->
+
+<script>
+var option = {
+  engineKey: '084e2ef4b40406a66fd1'
+};
+(function(w,d,t,u,n,s,e){
+  s = d.createElement(t);
+  s.src = u;
+  s.async = 1;
+  w[n] = function(r){
+    w[n].opts = r;
+  };
+  e = d.getElementsByTagName(t)[0];
+  e.parentNode.insertBefore(s, e);
+})(window,document,'script','//tinysou-cdn.b0.upaiyun.com/ts.js','_ts');
+_ts(option);
+</script>
 
 <!-- Tiny_search End -->
 

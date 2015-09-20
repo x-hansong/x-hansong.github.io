@@ -5,7 +5,7 @@
   <subtitle><![CDATA[悲观的意志,乐观的头脑]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="https://github.com/x-hansong//"/>
-  <updated>2015-08-26T08:42:46.000Z</updated>
+  <updated>2015-09-20T06:58:54.000Z</updated>
   <id>https://github.com/x-hansong//</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://github.com/x-hansong/2015/08/24/Linux%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7%E9%93%BE/"/>
     <id>https://github.com/x-hansong/2015/08/24/Linux源码分析工具链/</id>
     <published>2015-08-24T02:02:11.000Z</published>
-    <updated>2015-08-26T08:42:46.000Z</updated>
+    <updated>2015-09-20T06:58:54.000Z</updated>
     <content type="html"><![CDATA[<h2 id="前言">前言</h2><p>看源代码是一个程序员必须经历的事情,也是可以提升能力的一个捷径.个人认为: <strong>要完全掌握一个软件的方法只有阅读源码</strong><br>在Windows下有sourceinsight这个源码阅读软件(虽然我没用过,但是网上评价还不错),由于我是个Linuxer,并不喜欢用Windows,所以自然是选择在Linux下阅读源码的工具了.<br>下面我将逐一介绍在Linux下阅读源码的工具.</p>
 <h2 id="vim+ctags+cscope">vim+ctags+cscope</h2><p>源码阅读三剑客.vim配合ctags和cscope,足以在源代码里面自由翱翔,在函数和变量间自由跳转.</p>
 <h3 id="安装">安装</h3><figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-<span class="built_in">get</span> install <span class="keyword">vim</span> ctags <span class="keyword">cscope</span></span><br></pre></td></tr></table></figure>
@@ -68,7 +68,7 @@
   <figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">GENERATE_HTML</span></span><br><span class="line">GENERATE_LATEX</span><br><span class="line">GENERATE_RTF</span><br><span class="line">GENERATE_XML</span><br><span class="line">GENERATE_DOCBOOK</span><br><span class="line">GENERATE_MAN</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>关于生成图像的选项.doxygen使用dot这个工具来绘图,所以要先执行<code>sudo apt-get install graphviz</code>安装dot.在设置好这个绘图选项之后,doxygen就会生成各个结构体的关系,对于类会生成函数调用关系(我没试过,因为只试过C的).</p>
-  <figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">HAVE_DOT <span class="list">(一定要置为YES,后面的选项都依赖这个)</span></span><br><span class="line">DOT_NUM_THREADS <span class="list">(使用dot绘图的线程数量,越多越快,我一般是设置跟cpu的核数一样)</span></span><br></pre></td></tr></table></figure>
+  <figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">H<span class="built_in">AVE_DOT</span> (一定要置为<span class="literal">YES</span>,后面的选项都依赖这个)</span><br><span class="line">DOT_NUM_THREADS (使用dot绘图的线程数量,越多越快,我一般是设置跟cpu的核数一样)</span><br><span class="line"><span class="comment">//以下两个选项跟生成函数调用关系图有关</span></span><br><span class="line"><span class="built_in">CALL_GRAPH</span></span><br><span class="line"><span class="built_in">CALLER_GRAPH</span></span><br><span class="line">EXTRACT_ALL <span class="comment">//把所有实体都输出到文档,不管它是否能被描述</span></span><br><span class="line">EXTRACT_STATIC <span class="comment">//把静态变量也输出到文档中</span></span><br><span class="line">EXTRACT_PRIVATE <span class="comment">//把私有变量也输出到文档中</span></span><br></pre></td></tr></table></figure>
 <p>  给一个结构体关系图,就是doxygen生成的.</p>
   <img src="/2015/08/24/Linux源码分析工具链/00.png" alt="[machine_class]" title="[machine_class]"></li>
 <li><p>关于源码搜索路径,默认是搜索本目录的源代码,大部分情况下源码是分布在各个子目录的.</p>

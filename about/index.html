@@ -3,6 +3,7 @@
     <!DOCTYPE HTML>
 <html lang="zh-CN">
 <head>
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
 <meta name="google-site-verification" content="6wlbKgFEjRhJyXF4xjxEpA_IpuycvAMznqNQvAZ0OCY" />
 <meta name="baidu-site-verification" content="28u1lswj4v" />
   <meta charset="UTF-8">
@@ -69,11 +70,10 @@ Contact MeMail: x.hansong.scut@gmail.comMy Github">
 					
 					<li>
  					
-					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
-						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
-						<input type="hidden" name="q" value="site:github.com/x-hansong">
-					</form>
+						<form class="search">
+							<label>Search</label>
+						<input type="text" id="ts-search-input" name="q" size="30" placeholder="搜索"><br>
+						</form>
 					
 					</li>
 				</ul>
@@ -184,6 +184,7 @@ Contact MeMail: x.hansong.scut@gmail.comMy Github">
 <script src="/js/jquery.imagesloaded.min.js"></script>
 <script src="/js/gallery.js"></script>
 
+
 <script type="text/javascript">
 $(document).ready(function(){ 
   $('.navbar').click(function(){
@@ -272,6 +273,13 @@ $(document).ready(function(){
     || document.getElementsByTagName('body')[0]).appendChild(ds);
   })();
 </script> 
+     
+  	  <script type="text/javascript">
+  		var duoshuo_user_ID = 7607035
+  	  </script>
+<script src="/js/ua-parser.min.js"></script>
+<script src="/js/hook-duoshuo.js"></script>
+
 
 
 
@@ -331,6 +339,23 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
 <!-- MathJax End -->
 
 <!-- Tiny_search Begin -->
+
+<script>
+var option = {
+  engineKey: '084e2ef4b40406a66fd1'
+};
+(function(w,d,t,u,n,s,e){
+  s = d.createElement(t);
+  s.src = u;
+  s.async = 1;
+  w[n] = function(r){
+    w[n].opts = r;
+  };
+  e = d.getElementsByTagName(t)[0];
+  e.parentNode.insertBefore(s, e);
+})(window,document,'script','//tinysou-cdn.b0.upaiyun.com/ts.js','_ts');
+_ts(option);
+</script>
 
 <!-- Tiny_search End -->
 
